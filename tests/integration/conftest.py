@@ -36,6 +36,9 @@ CMS_TEST_CONFIG = {
     "global_head_html": '<meta name="site-verification" content="theme-cms-test">',
     "seo_prerender_enabled": True,
     "prerender_service_url": "",
+    # Pinned, not inherited: the breadcrumb + archive specs assert the structured
+    # permalink trail, and the cms default ("off") differs from a local operator config.
+    "posts_permalink_mode": "structured",
 }
 
 
