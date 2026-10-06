@@ -1,0 +1,1 @@
+{%- if card.tags %}<div class="post-card__tags" data-testid="post-tags">{% for tag in card.tags %}<a href="{{ tag.href }}" class="post-card__tag" data-testid="post-tag">{{ tag.name }}</a>{% endfor %}</div>{% endif -%}

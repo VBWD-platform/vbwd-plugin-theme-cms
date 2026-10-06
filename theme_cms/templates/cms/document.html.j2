@@ -1,0 +1,24 @@
+{#- The CMS document: the basic shell without its chrome — a CMS layout brings its
+    own header/footer areas (the SPA renders cmsLayout routes the same way). -#}
+{% extends "_shared/document.html.j2" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block head %}
+{{- super() }}
+  {%- if cms_seo is defined %}{% include "cms/partials/seo_head.html.j2" %}{% endif %}
+  <style data-theme-cms-runtime>.cms-layout > [data-vbwd-region]{display:contents}</style>
+  {%- if cms_page_style_css is defined and cms_page_style_css %}
+  <style data-cms-page-style>{{ cms_page_style_css }}</style>
+  {%- endif %}
+  {%- if cms_layout_head_html is defined %}{{ cms_layout_head_html }}{% endif %}
+  {%- if cms_global_head_html is defined %}{{ cms_global_head_html }}{% endif %}
+{% endblock %}
+{% block body %}
+  {% include "_shared/partials/language_switcher.html.j2" %}
+  <div class="cms-page">{% block cms_content %}{% endblock %}</div>
+{%- endblock %}
+{% block scripts %}
+{{- super() }}
+  <script>{% include "cms/partials/cms_widgets_runtime.js" %}</script>
+  <script>{% include "cms/partials/cms_cookie_consent_runtime.js" %}</script>
+  <script>{% include "cms/partials/cms_search_runtime.js" %}</script>
+{%- endblock %}

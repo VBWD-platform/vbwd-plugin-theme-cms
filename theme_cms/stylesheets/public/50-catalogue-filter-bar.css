@@ -1,0 +1,64 @@
+/* theme_cms (S152-09) — the fe-core CatalogueFilterBar.vue CSS, for the shared
+   cms/macros/catalogue_filter_bar.html.j2 every themed catalogue renders (shop
+   ProductGrid, booking BookingCatalogue). Structural only; every colour is the
+   SPA's own var(--…, fallback) chain. The segmented control is not built, so its
+   rules are not ported. */
+.vbwd-catalogue-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px 24px;
+  padding: 16px;
+  background: var(--color-surface-muted, var(--vbwd-color-surface-muted, #f8f9fa));
+  border: 1px solid var(--color-border, var(--vbwd-color-border, #e9ecef));
+  border-radius: 10px;
+}
+.vbwd-filter-field { display: flex; flex-direction: column; gap: 6px; }
+.vbwd-filter-field--chips { flex: 1 1 100%; }
+.vbwd-filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, var(--vbwd-color-text-muted, #6b7280));
+}
+.vbwd-filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border, var(--vbwd-color-border, #d1d5db));
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 180px;
+  background: var(--color-surface, var(--vbwd-color-surface, #fff));
+  color: var(--color-text, var(--vbwd-color-text, #333));
+}
+.vbwd-daterange { display: inline-flex; align-items: center; gap: 8px; }
+.vbwd-daterange-input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border, var(--vbwd-color-border, #d1d5db));
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--color-surface, var(--vbwd-color-surface, #fff));
+  color: var(--color-text, var(--vbwd-color-text, #333));
+}
+.vbwd-daterange-sep { color: var(--color-text-muted, var(--vbwd-color-text-muted, #6b7280)); }
+.vbwd-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.vbwd-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--color-border, var(--vbwd-color-border, #d1d5db));
+  border-radius: 999px;
+  background: var(--color-surface, var(--vbwd-color-surface, #fff));
+  color: var(--color-text, var(--vbwd-color-text, #374151));
+  cursor: pointer;
+  font-size: 12px;
+}
+.vbwd-chip--active {
+  background: var(--color-primary, var(--vbwd-color-primary, #3498db));
+  color: var(--color-on-primary, var(--vbwd-color-on-primary, #fff));
+  border-color: var(--color-primary, var(--vbwd-color-primary, #3498db));
+}
+@media (max-width: 640px) {
+  .vbwd-catalogue-filter-bar { flex-direction: column; gap: 14px; }
+  .vbwd-filter-field,
+  .vbwd-filter-select,
+  .vbwd-daterange { width: 100%; }
+}

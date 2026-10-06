@@ -1,0 +1,17 @@
+{#- CookieConsent.vue — ships hidden; cms_cookie_consent_runtime.js reads the
+    vbwd_cookie_consent record and opens it when a decision is needed. -#}
+{%- set consent = component_context -%}
+{%- if consent.css %}<style data-cookie-consent-css>{{ consent.css }}</style>{% endif -%}
+<div class="cookie-consent__backdrop{% if consent.is_bottom %} cookie-consent__backdrop--bottom{% endif %}" style="background: rgba(0, 0, 0, {{ consent.backdrop_opacity }})" data-testid="cookie-consent-backdrop" data-consent-version="{{ consent.consent_version }}" hidden>
+<div class="cookie-consent" role="dialog" aria-modal="true" aria-labelledby="cookie-consent-title" data-testid="cookie-consent">
+<h2 id="cookie-consent-title" class="cookie-consent__title" data-cookie-consent-layer="summary">{{ _('cms.cookieConsent.title') }}</h2>
+<p class="cookie-consent__summary" data-cookie-consent-layer="summary">{{ _('cms.cookieConsent.summary') }} <a href="{{ consent.privacy_policy_url }}" class="cookie-consent__policy-link" data-testid="cookie-policy-link">{{ _('cms.cookieConsent.privacyLink') }}</a></p>
+{%- if consent.additional_text %}<p class="cookie-consent__additional" data-testid="cookie-additional-text" data-cookie-consent-layer="summary">{{ consent.additional_text }}</p>{% endif -%}
+<div class="cookie-consent__actions" data-cookie-consent-layer="summary"><button type="button" class="cookie-consent__btn" data-testid="cookie-accept-all">{{ _('cms.cookieConsent.acceptAll') }}</button><button type="button" class="cookie-consent__btn" data-testid="cookie-reject-all">{{ _('cms.cookieConsent.rejectAll') }}</button><button type="button" class="cookie-consent__btn" data-testid="cookie-customize">{{ _('cms.cookieConsent.customize') }}</button></div>
+<h2 id="cookie-consent-customize-title" class="cookie-consent__title" data-cookie-consent-layer="customize" hidden>{{ _('cms.cookieConsent.customizeTitle') }}</h2>
+<ul class="cookie-consent__categories" data-cookie-consent-layer="customize" hidden>
+{%- for category in consent.categories %}<li class="cookie-consent__category"><label class="cookie-consent__category-label"><input type="checkbox" class="cookie-consent__toggle" data-cookie-category="{{ category }}" data-testid="cookie-toggle-{{ category }}"{% if category == 'necessary' %} checked disabled{% endif %}><span class="cookie-consent__category-name">{{ _('cms.cookieConsent.categories.' ~ category ~ '.name') }}</span></label><p class="cookie-consent__category-purpose">{{ _('cms.cookieConsent.categories.' ~ category ~ '.purpose') }}</p></li>{% endfor -%}
+</ul>
+<div class="cookie-consent__actions" data-cookie-consent-layer="customize" hidden><button type="button" class="cookie-consent__btn" data-testid="cookie-save">{{ _('cms.cookieConsent.save') }}</button></div>
+</div></div>
+{%- if consent.show_settings_button %}<button type="button" class="cookie-consent__settings" data-testid="cookie-settings" aria-label="{{ _('cms.cookieConsent.settings') }}" hidden>{{ _('cms.cookieConsent.settings') }}</button>{% endif -%}

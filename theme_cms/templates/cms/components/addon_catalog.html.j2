@@ -1,0 +1,14 @@
+{#- AddonCatalog.vue — the public add-ons with their gross price (PriceDisplay). -#}
+{%- set catalog = component_context -%}
+<div class="addon-catalog" data-testid="addon-catalog">
+{%- if catalog.heading %}<h2 class="addon-catalog__heading">{{ catalog.heading }}</h2>{% endif -%}
+{%- if catalog.error -%}
+<div class="addon-catalog__error" data-testid="addon-catalog-error">{{ catalog.error }}</div>
+{%- elif not catalog.addons -%}
+<div class="addon-catalog__empty" data-testid="addon-catalog-empty">{{ _('cms.addonCatalog.empty') }}</div>
+{%- else -%}
+<div class="addon-catalog__grid" data-testid="addon-catalog-grid">
+{%- for addon in catalog.addons %}<div class="addon-card" data-testid="addon-card"><h3 class="addon-card__name" data-testid="addon-card-name">{{ addon.name }}</h3>{% if addon.description %}<p class="addon-card__description">{{ addon.description }}</p>{% endif %}<p class="addon-card__price" data-testid="addon-card-price"><span class="price-display"><span class="price-display__amount" data-testid="price-amount">{{ addon.price_label }}</span></span></p></div>{% endfor -%}
+</div>
+{%- endif -%}
+</div>

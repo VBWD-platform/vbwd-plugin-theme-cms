@@ -1,0 +1,272 @@
+/* theme_cms (S152-06c) — post listing / archive / search CSS ported from
+   fe-user plugins/cms: PostCard.vue, PostList.vue, PostArchiveWidget.vue,
+   TermArchiveWidget.vue, CmsEmbedArchive.vue (pager), TagArchive.vue,
+   PostTermListWidget.vue, PostSearch.vue, PostSearchResults.vue, plus the
+   fe-core TagChips.vue / CustomFieldsDisplay.vue the post partial mirrors.
+   Structural only; every colour is the SPA's own var(--…, fallback) chain.
+   Not ported (literal colours the SPA hard-codes): the category card hover
+   shadow. */
+
+/* PostCard.vue */
+.post-card { margin: 0 0 1.5rem; }
+.post-card__media { display: block; margin-bottom: 0.75rem; }
+.post-card__title { margin: 0 0 0.35rem; font-size: 1.25rem; }
+.post-card__title a { color: var(--color-heading, #0f172a); text-decoration: none; }
+.post-card__title a:hover { text-decoration: underline; }
+.post-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin-bottom: 0.5rem;
+}
+.post-card__excerpt { margin: 0; color: var(--color-text, #334155); line-height: 1.55; }
+.post-card__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.6rem; }
+.post-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  text-decoration: none;
+  color: var(--color-primary, #4f46e5);
+  background: var(--color-surface-muted, #f1f5f9);
+  border: 1px solid var(--color-border, #e5e9f0);
+}
+.post-card__tag:hover { background: var(--color-surface, #fff); border-color: var(--color-primary, #4f46e5); }
+.post-card__body img { max-width: 100%; height: auto; }
+
+/* Category (WordPress-archive) mode */
+.post-card--category {
+  display: flex;
+  align-items: stretch;
+  gap: 1.5rem;
+  margin: 0 0 1.25rem;
+  padding: 1.25rem 1.375rem;
+  background: var(--vbwd-surface, var(--color-surface, #fff));
+  border: 1px solid var(--vbwd-border, var(--color-border, #e5e9f0));
+  border-radius: var(--vbwd-radius-card, 12px);
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+.post-card--category:hover {
+  border-color: var(--vbwd-primary, var(--color-primary, #4f46e5));
+  box-shadow: 0 6px 20px -8px var(--vbwd-cms-post-card-hover-shadow, rgba(15, 23, 42, 0.18));
+  transform: translateY(-1px);
+}
+.post-card__content { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.post-card__eyebrow {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--vbwd-primary, var(--color-primary, #4f46e5));
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+.post-card__eyebrow:hover { text-decoration: underline; }
+.post-card--category .post-card__title {
+  font-size: 1.4rem;
+  line-height: 1.25;
+  margin: 0 0 0.45rem;
+  letter-spacing: -0.01em;
+}
+.post-card--category .post-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--vbwd-muted, var(--color-text-muted, #64748b));
+}
+.post-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.12rem 0.5rem 0.12rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+.post-card__badge-icon { flex: 0 0 auto; }
+.post-card__badge--page {
+  color: var(--vbwd-muted, var(--color-text-muted, #475569));
+  background: var(--vbwd-table-head-bg, #f1f5f9);
+  border-color: var(--vbwd-border, var(--color-border, #e2e8f0));
+}
+.post-card__badge--post {
+  color: var(--vbwd-primary, var(--color-primary, #4f46e5));
+  background: color-mix(in srgb, var(--vbwd-primary, #4f46e5) 10%, transparent);
+  border-color: color-mix(in srgb, var(--vbwd-primary, #4f46e5) 22%, transparent);
+}
+.post-card--category .post-card__excerpt {
+  margin: 0;
+  color: var(--vbwd-muted, var(--color-text, #475569));
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-card__thumb {
+  flex: 0 0 30%;
+  max-width: 30%;
+  align-self: stretch;
+  min-height: 8.5rem;
+  border-radius: calc(var(--vbwd-radius-card, 12px) - 4px);
+  overflow: hidden;
+  background: var(--vbwd-table-head-bg, #f1f5f9);
+  display: block;
+}
+.post-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 640px) {
+  .post-card--category { flex-direction: column-reverse; gap: 1rem; }
+  .post-card__thumb { flex-basis: auto; max-width: 100%; aspect-ratio: 16 / 9; min-height: 0; }
+}
+
+/* PostList.vue */
+.post-list { display: block; }
+.post-list--gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.post-list__empty { color: var(--color-text-muted, #64748b); padding: 1.5rem 0; text-align: center; }
+
+/* Archive widgets */
+.post-archive-widget,
+.term-archive,
+.tag-archive,
+.post-term-list-widget { width: 100%; }
+.term-archive__header { margin: 0 0 1.25rem; }
+.term-archive__heading { margin: 0 0 0.5rem; font-size: 1.75rem; color: var(--color-heading, #0f172a); }
+.term-archive__description { margin: 0; color: var(--color-text-muted, #64748b); line-height: 1.55; }
+.tag-archive__heading { margin: 0 0 1rem; font-size: 1.5rem; color: var(--color-text, #0f172a); }
+.term-archive__hint,
+.term-archive__empty,
+.tag-archive__hint,
+.tag-archive__empty {
+  color: var(--color-text-muted, #64748b);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+.post-term-list-widget__rss {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #64748b);
+  text-decoration: none;
+}
+.post-term-list-widget__rss:hover { color: var(--vbwd-color-primary, #2563eb); }
+
+/* The ‹ n / m › pager (PostArchiveWidget, TermArchiveWidget, CmsEmbedArchive).
+   The SPA's buttons are links here; aria-disabled stands in for :disabled. */
+.post-archive-widget__pagination,
+.term-archive__pagination,
+.cms-embed-archive__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.post-archive-widget__pagination a,
+.term-archive__pagination a,
+.cms-embed-archive__pagination a { padding: 0.5rem 1rem; cursor: pointer; }
+.post-archive-widget__pagination a[aria-disabled="true"],
+.term-archive__pagination a[aria-disabled="true"],
+.cms-embed-archive__pagination a[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+.post-archive-widget__page-indicator,
+.term-archive__page-indicator { color: var(--color-text-muted, #64748b); font-size: 0.9rem; }
+
+/* PostSearch.vue */
+.post-search { position: relative; width: 100%; }
+.post-search__form { position: relative; width: 100%; }
+.post-search__input {
+  width: 100%;
+  padding: 0.6rem 2.75rem 0.6rem 0.9rem;
+  border: 1px solid var(--vbwd-input-border, #cbd5e1);
+  border-radius: var(--vbwd-input-radius, 6px);
+  background: var(--vbwd-input-bg, #fff);
+  color: var(--vbwd-input-text, #0f172a);
+  font-size: 1rem;
+}
+.post-search__input::-webkit-search-cancel-button,
+.post-search__input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.post-search__submit {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--vbwd-input-placeholder, var(--color-text-muted, #94a3b8));
+  cursor: pointer;
+}
+.post-search__submit:hover,
+.post-search__submit:focus,
+.post-search__submit:focus-visible { color: var(--vbwd-input-text, var(--color-text, #0f172a)); }
+.post-search__submit svg { display: block; width: 1.1rem; height: 1.1rem; }
+.post-search__dropdown {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  margin: 0.25rem 0 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  border: 1px solid var(--vbwd-input-border, #cbd5e1);
+  border-radius: var(--vbwd-input-radius, 6px);
+  background: var(--vbwd-surface, #fff);
+  box-shadow: var(--vbwd-shadow-md, 0 6px 20px rgba(15, 23, 42, 0.12));
+  max-height: 24rem;
+  overflow-y: auto;
+}
+.post-search__option { padding: 0.5rem 0.9rem; cursor: pointer; color: var(--vbwd-input-text, #0f172a); }
+.post-search__option--active,
+.post-search__option:hover { background: var(--vbwd-surface-hover, var(--color-surface-hover, #f1f5f9)); }
+
+/* PostSearchResults.vue */
+.post-search-results { width: 100%; margin-top: 1.75rem; }
+.post-search-results__count {
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--vbwd-border, var(--color-border, #e5e9f0));
+  font-size: 0.85rem;
+  color: var(--vbwd-muted, var(--color-text-muted, #64748b));
+}
+.post-search-results__hint,
+.post-search-results__empty { color: var(--color-text-muted, #64748b); padding: 1.5rem 0; text-align: center; }
+
+/* fe-core TagChips.vue */
+.vbwd-tag-chips { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.vbwd-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  background-color: var(--vbwd-color-secondary-light, #f3f4f6);
+  color: var(--vbwd-color-secondary-dark, #374151);
+}
+
+/* fe-core CustomFieldsDisplay.vue */
+.vbwd-custom-fields-display { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; }
+.vbwd-custom-field-row { display: contents; }
+.vbwd-custom-field-label { font-size: 0.85rem; color: var(--vbwd-color-text-secondary, #666); }
+.vbwd-custom-field-value { margin: 0; font-weight: 500; color: var(--vbwd-color-text-primary, #2c3e50); }

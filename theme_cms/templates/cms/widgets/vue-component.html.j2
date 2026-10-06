@@ -1,0 +1,9 @@
+{#- A vue-component widget: its themed component template (registry), an SPA link
+    card for an SPA-only plugin's component, else the missing marker. -#}
+{%- if widget.component -%}
+<div class="cms-widget cms-widget--vue{% if widget.slug %} cms-widget--{{ widget.slug }}{% endif %}">{% if widget.css %}<style>{{ widget.css }}</style>{% endif %}{% with component_context = widget.component.context %}{% include widget.component.template %}{% endwith %}</div>
+{%- elif widget.spa_link_href -%}
+<div class="cms-widget cms-widget--vue{% if widget.slug %} cms-widget--{{ widget.slug }}{% endif %} cms-widget--spa-link"><a class="cms-spa-link-widget" href="{{ widget.spa_link_href }}" data-testid="cms-spa-link-widget">{{ _('cms.spaLink.open') }}</a></div>
+{%- else -%}
+<div class="cms-widget cms-widget--vue cms-widget--vue-missing"><!-- cms widget component "{{ widget.component_name }}" not available --></div>
+{%- endif -%}

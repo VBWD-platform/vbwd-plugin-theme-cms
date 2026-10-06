@@ -1,0 +1,11 @@
+{#- PostSearch.vue — a GET form writing ?q= (works without JS); quicksearch adds the
+    htmx dropdown island (cms/fragments/quicksearch.html.j2). Expects ``search``. -#}
+{%- set search = component_context -%}
+<div class="post-search">
+<form class="post-search__form" role="search" method="get" action="{{ search.action }}">
+<input type="search" class="post-search__input" placeholder="{{ search.placeholder }}" data-testid="post-search-input" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="{{ search.listbox_id }}" name="q" value="{{ search.query }}"
+{%- if search.quicksearch %} autocomplete="off" hx-get="{{ search.quicksearch.url }}" hx-trigger="input changed delay:350ms, search" hx-target="#{{ search.listbox_id }}" hx-swap="outerHTML" hx-vals="{{ search.quicksearch['values'] }}"{% endif %}>
+<button type="submit" class="post-search__submit" aria-label="Search" data-testid="post-search-submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+</form>
+{%- if search.quicksearch %}{% with listbox_id = search.listbox_id, options = [] %}{% include "cms/fragments/quicksearch.html.j2" %}{% endwith %}{% endif -%}
+</div>

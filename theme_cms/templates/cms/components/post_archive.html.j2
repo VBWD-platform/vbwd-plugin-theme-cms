@@ -1,0 +1,6 @@
+{#- PostArchiveWidget.vue — the blog index. -#}
+{%- set post_list = component_context.post_list -%}
+<div class="post-archive-widget">
+{%- include "cms/components/_post_list.html.j2" -%}
+{%- if component_context.pagination %}{% with pagination = component_context.pagination, class_base = "post-archive-widget", testid_base = "post-archive" %}{% include "cms/components/_pagination.html.j2" %}{% endwith %}{% endif -%}
+</div>

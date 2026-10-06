@@ -1,0 +1,5 @@
+{#- PostTermListWidget.vue (Category / PostTermList) — a config-pinned term. -#}
+<div class="post-term-list-widget">
+{%- if component_context.rss_href %}<a class="post-term-list-widget__rss" href="{{ component_context.rss_href }}" data-testid="post-term-rss-link" title="{{ _('cms.rss.subscribe') }}"><span aria-hidden="true">🔖</span> {{ _('cms.rss.label') }}</a>{% endif -%}
+{%- set post_list = component_context.post_list %}{% include "cms/components/_post_list.html.j2" -%}
+</div>

@@ -1,0 +1,14 @@
+{#- TagArchive.vue — the posts of ``?tag=<slug>``. -#}
+{%- set archive = component_context -%}
+<div class="tag-archive">
+{%- if not archive.tag_slug -%}
+<p class="tag-archive__hint" data-testid="tag-archive-prompt">{{ _('cms.tagArchive.prompt') }}</p>
+{%- else -%}
+<h1 class="tag-archive__heading" data-testid="tag-archive-heading">{{ _('cms.tagArchive.heading', tag=archive.tag_label) }}</h1>
+{%- if archive.is_empty -%}
+<p class="tag-archive__empty" data-testid="tag-archive-empty">{{ _('cms.tagArchive.empty') }}</p>
+{%- else -%}
+{%- set post_list = archive.post_list %}{% include "cms/components/_post_list.html.j2" -%}
+{%- endif -%}
+{%- endif -%}
+</div>

@@ -1,0 +1,12 @@
+{#- PostSearchResults.vue — the matches of ?q=, rendered with the page. -#}
+{%- set results = component_context -%}
+<div class="post-search-results">
+{%- if not results.query -%}
+<p class="post-search-results__hint" data-testid="search-empty-query">{{ _('cms.search.prompt') }}</p>
+{%- elif results.is_empty -%}
+<p class="post-search-results__empty" data-testid="search-no-results">{{ _('cms.search.noResults') }}</p>
+{%- else -%}
+<p class="post-search-results__count" data-testid="search-result-count">{{ results.count_label }}</p>
+{%- set post_list = results.post_list %}{% include "cms/components/_post_list.html.j2" -%}
+{%- endif -%}
+</div>

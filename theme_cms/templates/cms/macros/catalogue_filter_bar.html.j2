@@ -1,0 +1,34 @@
+{#- fe-core CatalogueFilterBar — one named field per facet, inside the caller's GET form
+    (works without JS): a select / date bound submits its value, a chip ``toggle_tag``.
+    ``filters`` maps a facet key (and ``<key>_from`` / ``<key>_to``) to its value and
+    ``tags`` to the active tag slugs. ``segmented`` is not built: no themed catalogue
+    offers it. -#}
+{%- macro catalogue_filter_bar(facets, filters, all_label) -%}
+{%- if facets %}
+<div class="vbwd-catalogue-filter-bar" data-testid="catalogue-filter-bar">
+  {%- for facet in facets %}
+  <div class="vbwd-filter-field{% if facet.control == 'chips' %} vbwd-filter-field--chips{% endif %}">
+    <span class="vbwd-filter-label">{{ facet.label }}</span>
+    {%- if facet.control == 'select' %}
+    <select name="{{ facet.key }}" class="vbwd-filter-select" data-testid="catalogue-facet-select-{{ facet.key }}">
+      <option value="">{{ all_label }}</option>
+      {%- for option in facet.options %}
+      <option value="{{ option.value }}"{% if option.value == filters.get(facet.key) %} selected{% endif %}>{{ option.label }}</option>
+      {%- endfor %}
+    </select>
+    {%- elif facet.control == 'date-range' %}
+    <div class="vbwd-daterange" role="group" data-testid="catalogue-facet-daterange-{{ facet.key }}">
+      <input type="date" name="{{ facet.key }}_from" class="vbwd-daterange-input" aria-label="{{ facet.label }} from" data-testid="catalogue-facet-daterange-{{ facet.key }}-from" value="{{ filters.get(facet.key ~ '_from') or '' }}">
+      <span class="vbwd-daterange-sep">–</span>
+      <input type="date" name="{{ facet.key }}_to" class="vbwd-daterange-input" aria-label="{{ facet.label }} to" data-testid="catalogue-facet-daterange-{{ facet.key }}-to" value="{{ filters.get(facet.key ~ '_to') or '' }}">
+    </div>
+    {%- else %}
+    <div class="vbwd-chips" data-testid="catalogue-facet-chips-{{ facet.key }}">
+      {%- for option in facet.options %}<button type="submit" name="toggle_tag" value="{{ option.value }}" class="vbwd-chip{% if option.value in filters.tags %} vbwd-chip--active{% endif %}" data-testid="catalogue-facet-chip-{{ facet.key }}-{{ option.value }}">{{ option.label }}</button>{% endfor %}
+    </div>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</div>
+{%- endif %}
+{%- endmacro -%}

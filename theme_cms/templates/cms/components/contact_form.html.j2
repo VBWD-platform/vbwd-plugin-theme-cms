@@ -1,0 +1,36 @@
+{#- ContactForm.vue — posts through htmx to the contact fragment, which answers this
+    whole widget again (success, or the form with its errors). Expects ``form``. -#}
+{%- set form = component_context -%}
+<div class="contact-form-widget">
+{%- if form.css %}<style data-contact-form-css>{{ form.css }}</style>{% endif -%}
+{%- if form.analytics_html %}<div class="contact-form-widget__analytics">{{ form.analytics_html }}</div>{% endif -%}
+{%- if not form.is_configured -%}
+<div class="contact-form-widget__error" data-testid="cf-not-configured"><p>{{ _('contactForm.notConfigured') }}</p></div>
+{%- elif form.submitted -%}
+<div class="contact-form-widget__success" data-testid="cf-success"><p>{{ form.success_message or _('contactForm.defaultSuccess') }}</p></div>
+{%- else -%}
+<form class="contact-form-widget__form" data-testid="cf-form" novalidate method="post" action="{{ form.action }}" hx-post="{{ form.action }}" hx-target="closest .contact-form-widget" hx-swap="outerHTML" hx-disabled-elt="find .contact-form-widget__submit">
+<input type="hidden" name="widget_slug" value="{{ form.widget_slug }}">
+<div class="contact-form-widget__hp" aria-hidden="true" style="display:none !important; position:absolute; left:-9999px;"><label for="_cf_hp">Leave blank</label><input id="_cf_hp" type="text" name="_hp" tabindex="-1" autocomplete="off" value=""></div>
+{%- for field in form.fields -%}
+{%- set value = form['values'].get(field.id, '') -%}
+{%- set required_attributes %}{% if field.required %} required{% endif %}{% if field.required is not none %} aria-required="{{ 'true' if field.required else 'false' }}"{% endif %}{% endset -%}
+<div class="contact-form-widget__field"><label for="cf_{{ field.id }}" class="contact-form-widget__label">{{ field.label }}{% if field.required %}<span class="contact-form-widget__required" aria-hidden="true">*</span>{% endif %}</label>
+{%- if field.type == 'textarea' -%}
+<textarea id="cf_{{ field.id }}" class="contact-form-widget__input contact-form-widget__textarea" name="{{ field.id }}"{{ required_attributes }} rows="4" data-testid="cf-field-{{ field.id }}">{{ value }}</textarea>
+{%- elif field.type in ('radio', 'checkbox') -%}
+<div class="contact-form-widget__{{ field.type }}-group" data-testid="cf-field-{{ field.id }}">
+{%- for option in field.options %}<label class="contact-form-widget__option"><input type="{{ field.type }}" name="{{ field.id }}" value="{{ option }}"{% if field.type == 'radio' and field.required %} required{% endif %}{% if (value is string and value == option) or (value is not string and option in value) %} checked{% endif %}> {{ option }}</label>{% endfor -%}
+</div>
+{%- else -%}
+<input id="cf_{{ field.id }}" class="contact-form-widget__input" type="{{ field.type }}" name="{{ field.id }}"{{ required_attributes }} data-testid="cf-field-{{ field.id }}" value="{{ value }}">
+{%- endif -%}
+{%- if field.id in form.field_errors %}<p class="contact-form-widget__field-error" role="alert" data-testid="cf-error-{{ field.id }}">{{ _('contactForm.fieldRequired', label=field.label) }}</p>{% endif -%}
+</div>
+{%- endfor -%}
+{%- if form.captcha_html %}<div class="contact-form-widget__captcha">{{ form.captcha_html }}</div>{% endif -%}
+{%- if form.global_error %}<p class="contact-form-widget__error-msg" role="alert" data-testid="cf-global-error">{{ form.global_error.message or _(form.global_error.key) }}</p>{% endif -%}
+<button type="submit" class="contact-form-widget__submit" data-testid="cf-submit">{{ _('contactForm.submit') }}</button>
+</form>
+{%- endif -%}
+</div>

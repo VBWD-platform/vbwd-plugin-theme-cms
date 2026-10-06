@@ -1,0 +1,7 @@
+{#- The ‹ n / m › pager of PostArchiveWidget / TermArchiveWidget; the SPA's buttons
+    are links here (``class_base``, ``testid_base``, ``pagination``). -#}
+<div class="{{ class_base }}__pagination">
+{%- if pagination.previous_href %}<a data-testid="{{ testid_base }}-prev" href="{{ pagination.previous_href }}">‹</a>{% else %}<a data-testid="{{ testid_base }}-prev" aria-disabled="true">‹</a>{% endif -%}
+<span class="{{ class_base }}__page-indicator">{{ pagination.page }} / {{ pagination.pages }}</span>
+{%- if pagination.next_href %}<a data-testid="{{ testid_base }}-next" href="{{ pagination.next_href }}">›</a>{% else %}<a data-testid="{{ testid_base }}-next" aria-disabled="true">›</a>{% endif -%}
+</div>

@@ -1,0 +1,9 @@
+{#- S77 core tags + custom fields (fe-core TagChips + CustomFieldsDisplay markup). -#}
+{%- from "cms/macros/tags_custom_fields.html.j2" import tag_chips, custom_fields_display %}
+{%- set block = cms_tags_custom_fields if cms_tags_custom_fields is defined else none %}
+{%- if block %}
+<div class="cms-page__tags-custom-fields" data-testid="page-tags-custom-fields">
+{{- tag_chips(block.tags) }}
+{{- custom_fields_display(block.custom_fields) }}
+</div>
+{%- endif %}

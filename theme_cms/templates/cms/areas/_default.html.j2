@@ -1,0 +1,6 @@
+{#- A widget area; an area with no widget renders nothing (its region stays, empty). -#}
+{%- if area.widgets -%}
+<div class="cms-area cms-area--{{ area.type }}"><div class="container">
+{%- for widget in area.widgets %}{% include ["cms/widgets/" ~ widget.widget_type ~ ".html.j2", "cms/widgets/_unknown.html.j2"] %}{% endfor -%}
+</div></div>
+{%- endif -%}

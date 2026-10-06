@@ -1,0 +1,376 @@
+/* theme_cms (S152-06c) — CMS component CSS ported from fe-user: plugins/cms
+   SuperHeader.vue, ContactForm.vue, CookieConsent.vue, AddonCatalog.vue,
+   plugins/landing1/Landing1View.vue (rendered by NativePricingPlans) and the
+   fe-core VbwdBreadcrumb.vue (rendered by CmsBreadcrumb).
+   Structural only; every colour is the SPA's own var(--…, fallback) chain.
+   The literal colours the SPA hard-codes — the cookie dialog / settings pill
+   shadows, the contact input focus ring, the addon and plan card shadows and
+   the landing1 palette presets (.landing1--light, --dark, --teal, --indigo,
+   --emerald) — are the fallbacks of --vbwd-cms-* tokens (S152-06d), so a child
+   theme's tokens.json or a CMS style overrides them. The SPA's literal `#fff` text on the
+   landing1 primary buttons / badge uses the SPA's text-on-accent token
+   var(--color-accent-fg, #fff) — the same rendering by default. */
+
+/* SuperHeader.vue */
+.cms-super-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+}
+.cms-super-header__logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text, #0f172a);
+}
+.cms-super-header__logo-img { display: block; max-height: 2.25rem; width: auto; }
+.cms-super-header__nav { display: flex; align-items: center; min-width: 0; }
+.cms-super-header__search { margin-left: auto; flex: 1 1 auto; min-width: 0; max-width: 22rem; }
+.cms-super-header__auth { flex-shrink: 0; }
+.cms-super-header__auth-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: var(--vbwd-input-radius, 6px);
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--color-primary-contrast, #fff);
+  background: var(--color-primary, #2563eb);
+}
+.cms-super-header__auth-link:hover { opacity: 0.9; }
+.cms-super-header__auth-link--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  background: transparent;
+  color: var(--color-text, #0f172a);
+}
+.cms-super-header__auth-link--icon svg { display: block; width: 1.375rem; height: 1.375rem; }
+@media (max-width: 768px) {
+  .cms-super-header { gap: 0.5rem; flex-wrap: wrap; padding-left: 0.75rem; padding-right: 0.75rem; }
+  .cms-super-header__search { order: 3; flex-basis: 100%; max-width: none; margin-left: 0; }
+  .cms-super-header__nav { margin-left: auto; }
+}
+
+/* fe-core VbwdBreadcrumb.vue */
+.vbwd-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--vbwd-text-muted, #6b7280);
+  padding: 8px 0 16px;
+}
+.vbwd-breadcrumb a,
+.vbwd-breadcrumb__link { color: var(--vbwd-color-primary, #3498db); text-decoration: none; }
+.vbwd-breadcrumb a:hover,
+.vbwd-breadcrumb__link:hover { text-decoration: underline; }
+.vbwd-breadcrumb__separator { color: var(--vbwd-text-muted, #9ca3af); user-select: none; }
+.vbwd-breadcrumb__current { color: var(--vbwd-text-body, #374151); font-weight: 500; }
+
+/* ContactForm.vue */
+.contact-form-widget { max-width: 680px; margin: 0 auto; padding: 32px 24px; font-family: var(--vbwd-font-body, inherit); }
+.contact-form-widget__hp { display: none !important; position: absolute; left: -9999px; }
+.contact-form-widget__form { display: flex; flex-direction: column; gap: 20px; }
+.contact-form-widget__field { display: flex; flex-direction: column; gap: 6px; }
+.contact-form-widget__label { font-size: 0.9rem; font-weight: 600; color: var(--vbwd-text-heading, #2c3e50); }
+.contact-form-widget__required { color: var(--vbwd-color-error, #e74c3c); margin-left: 2px; }
+.contact-form-widget__input {
+  padding: 10px 14px;
+  border: 1px solid var(--vbwd-border-color, #d1d5db);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--vbwd-text-body, #333);
+  background: var(--vbwd-card-bg, #fff);
+  transition: border-color 0.15s;
+  outline: none;
+}
+.contact-form-widget__input:focus {
+  border-color: var(--vbwd-color-primary, #3498db);
+  box-shadow: 0 0 0 3px var(--vbwd-cms-contact-input-focus-ring, rgba(52, 152, 219, 0.15));
+}
+.contact-form-widget__textarea { resize: vertical; min-height: 110px; }
+.contact-form-widget__radio-group,
+.contact-form-widget__checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+.contact-form-widget__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--vbwd-text-body, #333);
+  cursor: pointer;
+}
+.contact-form-widget__field-error { font-size: 0.82rem; color: var(--vbwd-color-error, #e74c3c); margin: 0; }
+.contact-form-widget__error-msg { font-size: 0.9rem; color: var(--vbwd-color-error, #e74c3c); margin: 0; }
+.contact-form-widget__submit {
+  align-self: flex-start;
+  padding: 12px 28px;
+  background: var(--vbwd-color-primary, #3498db);
+  color: var(--color-accent-fg, #fff);
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.contact-form-widget__submit:hover:not(:disabled) { background: var(--vbwd-color-primary-hover, #2980b9); }
+.contact-form-widget__submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.contact-form-widget__success {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--vbwd-color-success, #27ae60);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.contact-form-widget__error { text-align: center; padding: 40px 24px; color: var(--vbwd-text-muted, #666); font-size: 0.9rem; }
+
+/* CookieConsent.vue (the backdrop blend stays inline, from config) */
+.cookie-consent__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+/* The runtime toggles the dialog and its layers with the `hidden` attribute
+   (the SPA used v-if); keep it winning over the flex rules here. */
+.cookie-consent__backdrop[hidden],
+.cookie-consent [hidden] { display: none; }
+.cookie-consent__backdrop--bottom { align-items: flex-end; }
+.cookie-consent__backdrop--bottom .cookie-consent { width: min(960px, 100%); }
+.cookie-consent {
+  pointer-events: auto;
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  border-radius: 12px;
+  background: var(--vbwd-card-bg, #fff);
+  color: var(--vbwd-text-body, #333);
+  box-shadow: 0 12px 40px var(--vbwd-cms-cookie-consent-shadow, rgba(0, 0, 0, 0.25));
+  font-family: var(--vbwd-font-body, inherit);
+}
+.cookie-consent__title { margin: 0 0 0.75rem; font-size: 1.25rem; font-weight: 700; color: var(--vbwd-text-heading, #2c3e50); }
+.cookie-consent__summary { margin: 0 0 1.25rem; font-size: 0.95rem; line-height: 1.5; }
+.cookie-consent__additional { margin: -0.5rem 0 1.25rem; font-size: 0.9rem; line-height: 1.5; opacity: 0.85; }
+.cookie-consent__policy-link { color: var(--vbwd-color-primary, #3498db); text-decoration: underline; }
+.cookie-consent__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.cookie-consent__btn {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 0.7rem 1.25rem;
+  border: 1px solid var(--vbwd-color-primary, #3498db);
+  border-radius: 6px;
+  background: var(--vbwd-color-primary, #3498db);
+  color: var(--color-accent-fg, #fff);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+.cookie-consent__btn:hover { background: var(--vbwd-color-primary-hover, #2980b9); }
+.cookie-consent__btn:focus-visible { outline: 3px solid var(--vbwd-color-primary, #3498db); outline-offset: 2px; }
+.cookie-consent__categories {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.cookie-consent__category-label { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; cursor: pointer; }
+.cookie-consent__category-purpose { margin: 0.35rem 0 0 1.7rem; font-size: 0.85rem; opacity: 0.75; }
+.cookie-consent__settings {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 9000;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--vbwd-border-color, #d1d5db);
+  border-radius: 999px;
+  background: var(--vbwd-card-bg, #fff);
+  color: var(--vbwd-text-body, #333);
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--vbwd-cms-cookie-settings-shadow, rgba(0, 0, 0, 0.15));
+}
+@media (prefers-reduced-motion: reduce) {
+  .cookie-consent__btn { transition: none; }
+}
+
+/* AddonCatalog.vue */
+.addon-catalog { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+.addon-catalog__heading { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
+.addon-catalog__error,
+.addon-catalog__empty { padding: 2rem; text-align: center; color: var(--vbwd-text-secondary, #666); }
+.addon-catalog__error { color: var(--vbwd-color-danger, #dc3545); }
+.addon-catalog__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+.addon-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--vbwd-border-color, #ddd);
+  border-radius: 8px;
+  padding: 1rem 1.25rem 1.25rem;
+  transition: box-shadow 0.15s;
+}
+.addon-card:hover { box-shadow: 0 4px 12px var(--vbwd-cms-addon-card-hover-shadow, rgba(0, 0, 0, 0.1)); }
+.addon-card__name { font-size: 1.0625rem; font-weight: 600; margin: 0 0 0.5rem; line-height: 1.3; }
+.addon-card__description { font-size: 0.9375rem; color: var(--vbwd-text-secondary, #666); margin: 0 0 0.75rem; flex: 1; }
+.addon-card__price { font-size: 1rem; font-weight: 700; color: var(--vbwd-color-primary, #333); margin: 0; }
+@media (max-width: 640px) {
+  .addon-catalog__grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+}
+
+/* landing1 Landing1View.vue (NativePricingPlans) — its --l1-* roles fall back
+   to the shared vbwd-* tokens, so the widget tracks the active CMS style. */
+.landing1 {
+  --l1-primary: var(--vbwd-color-primary, #3498db);
+  --l1-primary-hover: var(--vbwd-color-primary-hover, #2980b9);
+  --l1-card-bg: var(--vbwd-card-bg, #ffffff);
+  --l1-text-heading: var(--vbwd-text-heading, #1f2937);
+  --l1-text-muted: var(--vbwd-text-muted, #6b7280);
+  --l1-border: var(--vbwd-border-light, #e5e7eb);
+  --l1-check: var(--l1-primary);
+  --l1-card-shadow: var(--vbwd-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+/* landing1 palette presets: each role is a --vbwd-cms-landing1-<preset>-<role>
+   token whose fallback is the SPA preset's literal. */
+.landing1--light {
+  --l1-card-bg: var(--vbwd-cms-landing1-light-card-bg, #ffffff);
+  --l1-text-heading: var(--vbwd-cms-landing1-light-text-heading, #1f2937);
+  --l1-text-muted: var(--vbwd-cms-landing1-light-text-muted, #6b7280);
+  --l1-border: var(--vbwd-cms-landing1-light-border, #e5e7eb);
+}
+.landing1--dark {
+  --l1-primary: var(--vbwd-cms-landing1-dark-primary, #3b82f6);
+  --l1-primary-hover: var(--vbwd-cms-landing1-dark-primary-hover, #2563eb);
+  --l1-card-bg: var(--vbwd-cms-landing1-dark-card-bg, #1f2937);
+  --l1-text-heading: var(--vbwd-cms-landing1-dark-text-heading, #f9fafb);
+  --l1-text-muted: var(--vbwd-cms-landing1-dark-text-muted, #9ca3af);
+  --l1-border: var(--vbwd-cms-landing1-dark-border, #374151);
+  --l1-card-shadow: 0 2px 14px var(--vbwd-cms-landing1-dark-card-shadow, rgba(0, 0, 0, 0.5));
+}
+.landing1--teal {
+  --l1-primary: var(--vbwd-cms-landing1-teal-primary, #14b8a6);
+  --l1-primary-hover: var(--vbwd-cms-landing1-teal-primary-hover, #0d9488);
+  --l1-check: var(--vbwd-cms-landing1-teal-check, #14b8a6);
+}
+.landing1--indigo {
+  --l1-primary: var(--vbwd-cms-landing1-indigo-primary, #6366f1);
+  --l1-primary-hover: var(--vbwd-cms-landing1-indigo-primary-hover, #4f46e5);
+  --l1-check: var(--vbwd-cms-landing1-indigo-check, #6366f1);
+}
+.landing1--emerald {
+  --l1-primary: var(--vbwd-cms-landing1-emerald-primary, #10b981);
+  --l1-primary-hover: var(--vbwd-cms-landing1-emerald-primary-hover, #059669);
+  --l1-check: var(--vbwd-cms-landing1-emerald-check, #10b981);
+}
+.landing1-header { text-align: center; margin-bottom: 40px; }
+.landing1-header h1 { font-size: 2rem; color: var(--l1-text-heading); margin-bottom: 10px; }
+.landing1 .subtitle { color: var(--l1-text-muted); font-size: 1.1rem; }
+.landing1 .error-state,
+.landing1 .empty-state { text-align: center; padding: 60px 20px; color: var(--l1-text-muted); }
+.landing1 .retry-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: var(--l1-primary);
+  color: var(--color-accent-fg, #fff);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.landing1 .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+.landing1 .plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--l1-card-bg);
+  padding: 32px 28px;
+  border-radius: 16px;
+  box-shadow: var(--l1-card-shadow);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  border: 2px solid transparent;
+}
+.landing1 .plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px var(--vbwd-cms-landing1-plan-card-hover-shadow, rgba(0, 0, 0, 0.14));
+  border-color: var(--l1-primary);
+}
+.landing1 .plan-card--featured {
+  border-color: var(--l1-primary);
+  box-shadow: 0 16px 40px var(--vbwd-cms-landing1-plan-card-featured-shadow, rgba(0, 0, 0, 0.16));
+  z-index: 1;
+}
+@media (min-width: 900px) {
+  .landing1 .plan-card--featured { transform: scale(1.05); }
+  .landing1 .plan-card--featured:hover { transform: scale(1.05) translateY(-4px); }
+}
+.landing1 .plan-card__badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--l1-primary);
+  color: var(--color-accent-fg, #fff);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px var(--vbwd-cms-landing1-plan-badge-shadow, rgba(0, 0, 0, 0.18));
+  white-space: nowrap;
+}
+.landing1 .plan-card__image { display: block; width: 72px; height: 72px; object-fit: contain; margin: 4px auto 16px; }
+.landing1 .plan-name { font-size: 1.35rem; font-weight: 700; color: var(--l1-text-heading); margin-bottom: 14px; }
+.landing1 .plan-price { margin-bottom: 18px; }
+.landing1 .plan-price__amount { font-size: 2.25rem; font-weight: 800; color: var(--l1-primary); }
+.landing1 .billing-period { font-size: 0.9rem; font-weight: 400; color: var(--l1-text-muted); }
+.landing1 .plan-description { color: var(--l1-text-muted); font-size: 0.9rem; margin-bottom: 18px; line-height: 1.5; }
+.landing1 .plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.landing1 .plan-features__item { display: flex; align-items: center; gap: 10px; color: var(--l1-text-muted); font-size: 0.95rem; }
+.landing1 .plan-features__check { flex-shrink: 0; width: 18px; height: 18px; color: var(--l1-check); }
+.landing1 .choose-plan-btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 14px;
+  background-color: var(--l1-primary);
+  color: var(--color-accent-fg, #fff);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.landing1 .choose-plan-btn:hover { background-color: var(--l1-primary-hover); }
+.landing1 .plan-card--featured .choose-plan-btn {
+  background-image: linear-gradient(135deg, var(--l1-primary), var(--l1-primary-hover));
+}

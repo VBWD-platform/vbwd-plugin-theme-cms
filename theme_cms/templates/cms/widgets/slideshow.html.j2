@@ -1,0 +1,14 @@
+<div class="cms-widget cms-widget--slideshow">
+{%- if not widget.slides -%}
+<div class="cms-slideshow--empty"></div>
+{%- else -%}
+<div class="cms-slideshow">
+{%- for slide in widget.slides -%}
+<div class="cms-slide{% if loop.first %} cms-slide--active{% endif %}"><img src="{{ slide.url }}" alt="{{ slide.alt }}" class="cms-slide__img">{% if slide.caption %}<p class="cms-slide__caption">{{ slide.caption }}</p>{% endif %}</div>
+{%- endfor -%}
+{%- if widget.slides|length > 1 -%}
+<button class="cms-slide__prev" type="button">‹</button><button class="cms-slide__next" type="button">›</button>
+{%- endif -%}
+</div>
+{%- endif -%}
+</div>

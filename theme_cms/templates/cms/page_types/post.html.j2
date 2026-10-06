@@ -1,0 +1,19 @@
+{#- CmsPageTypePost: the magazine hero (image or gradient), or the plain header when
+    type_data.show_featured_hero is false. Same markup as the SPA's headerHtml. -#}
+{% extends "cms/page_base.html.j2" %}
+{% block body_header -%}
+{%- set hero = cms_post_hero -%}
+{%- set title_html %}{% if hero.title %}<h1 class="cms-post-title">{{ hero.title }}</h1>{% endif %}{% endset -%}
+{%- set tags_html %}{% if hero.tags %}<div class="cms-post-tags" aria-label="Tags">{% for tag in hero.tags %}<a class="cms-post-tag" href="{{ tag.href }}">{{ tag.name }}</a>{% endfor %}</div>{% endif %}{% endset -%}
+{%- if not hero.enabled -%}
+{%- if hero.title or hero.tags %}<header class="cms-post-header">{{ title_html }}{{ tags_html }}</header>{% endif -%}
+{%- else -%}
+{%- set excerpt_html %}{% if hero.excerpt %}<p class="cms-post-excerpt">{{ hero.excerpt }}</p>{% endif %}{% endset -%}
+{%- if hero.image_url -%}
+<header class="cms-post-hero cms-post-hero--image" style="background-image: url(&quot;{{ hero.image_url }}&quot;);"><div class="cms-post-hero__scrim"></div>
+{%- else -%}
+<header class="cms-post-hero cms-post-hero--gradient">
+{%- endif -%}
+<div class="cms-post-hero__content"><div class="cms-post-hero__contrast">{{ title_html }}{{ excerpt_html }}</div>{{ tags_html }}</div></header>
+{%- endif -%}
+{%- endblock %}

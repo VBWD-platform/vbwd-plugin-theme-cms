@@ -1,0 +1,12 @@
+{#- SuperHeader.vue — logo, nav widget (by slug), PostSearch, account icon. -#}
+{%- set header = component_context -%}
+<header class="cms-super-header">
+<a class="cms-super-header__logo" href="{{ header.logo_link }}">
+{%- if header.logo_image_url %}<img class="cms-super-header__logo-img" src="{{ header.logo_image_url }}" alt="{{ header.logo_text }}">{% else %}<span class="cms-super-header__logo-text">{{ header.logo_text }}</span>{% endif -%}
+</a>
+<div class="cms-super-header__nav">
+{%- if header.nav_widget %}{% with widget = header.nav_widget %}{% include ["cms/widgets/" ~ widget.widget_type ~ ".html.j2", "cms/widgets/_unknown.html.j2"] %}{% endwith %}{% endif -%}
+</div>
+{%- if header.search %}<div class="cms-super-header__search">{% with component_context = header.search %}{% include "cms/components/search.html.j2" %}{% endwith %}</div>{% endif -%}
+{%- if header.auth_link %}<div class="cms-super-header__auth"><a class="cms-super-header__auth-link cms-super-header__auth-link--icon" href="{{ header.auth_link.href }}" aria-label="{{ header.auth_link.label }}" title="{{ header.auth_link.label }}" data-test-id="{{ header.auth_link.test_id }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a></div>{% endif -%}
+</header>

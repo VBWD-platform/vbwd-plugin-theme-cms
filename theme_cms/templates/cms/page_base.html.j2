@@ -1,0 +1,13 @@
+{#- CmsPageTypeBase: the layout (or the no-layout article) with the page type's
+    header fragment prepended INTO the content body. -#}
+{% extends "cms/document.html.j2" %}
+{% block body_header %}{% endblock %}
+{% block cms_content %}
+{%- set body_html = self.body_header() ~ cms_body_html %}
+{%- if cms_layout %}
+{% include "cms/layout.html.j2" %}
+{%- else %}
+<article class="cms-page__content"><h1 class="cms-page__title">{{ cms_page_heading }}</h1><div class="cms-page__body">{{ body_html }}</div></article>
+{%- endif %}
+{%- include "cms/partials/tags_custom_fields.html.j2" %}
+{% endblock %}

@@ -1,0 +1,10 @@
+<nav class="cms-widget cms-widget--menu{% if widget.slug %} cms-widget--{{ widget.slug }}{% endif %}">
+{%- if widget.css %}<style>{{ widget.css }}</style>{% endif -%}
+<button class="cms-burger" type="button" aria-label="Toggle menu"><span></span><span></span><span></span></button><div class="cms-menu-overlay"></div><ul class="cms-menu">
+{%- for item in widget.menu_items -%}
+<li class="cms-menu__item{% if item.has_children %} cms-menu__item--has-children{% endif %}"><a href="{{ item.href }}" target="{{ item.target }}" class="cms-menu__link">{% if item.icon %}<span class="cms-menu__icon">{{ item.icon }}</span>{% endif %}{{ item.label }}{% if item.has_children %}<span class="cms-menu__arrow">▾</span>{% endif %}</a>
+{%- if item.has_children %}<ul class="cms-menu__sub">{% for child in item.children %}<li class="cms-menu__item"><a href="{{ child.href }}" target="{{ child.target }}" class="cms-menu__link">{% if child.icon %}<span class="cms-menu__icon">{{ child.icon }}</span>{% endif %}{{ child.label }}</a></li>{% endfor %}</ul>{% endif -%}
+</li>
+{%- endfor -%}
+{%- if widget.show_cart %}<li class="cms-menu__item cms-menu__item--cart">{% if widget.cart_badge %}{% with component_context = widget.cart_badge.context %}{% include widget.cart_badge.template %}{% endwith %}{% endif %}</li>{% endif -%}
+</ul></nav>

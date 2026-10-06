@@ -1,0 +1,64 @@
+/* theme_cms (S152-06c) — menu + slideshow widget CSS ported from fe-user
+   plugins/cms CmsWidgetRenderer.vue (its global and scoped blocks merged).
+   The burger / drawer / overlay classes are toggled by the theme_cms widget
+   runtime exactly as the SPA toggles them. The SPA's literal colours (overlay
+   dim, dropdown / drawer shadows, slideshow arrow backdrop) are the fallbacks of
+   --vbwd-cms-* tokens (S152-06d): the SPA look by default, a child theme's
+   tokens.json or a CMS style overrides them. */
+
+.cms-widget--html { width: 100%; }
+
+/* Menu: base, shared across all screen sizes */
+.cms-widget--menu { display: flex; align-items: center; position: relative; z-index: 200; width: 100%; }
+.cms-menu { list-style: none; margin: 0; padding: 0; }
+.cms-menu__item { position: relative; }
+.cms-menu__link { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; color: inherit; text-decoration: none; font-weight: 500; white-space: nowrap; cursor: pointer; user-select: none; }
+.cms-menu__link:hover { opacity: 0.75; }
+.cms-menu__sub { display: none; list-style: none; margin: 0; padding: 0.25rem 0; }
+.cms-menu__sub--open { display: block; }
+.cms-menu__sub .cms-menu__link { padding: 0.45rem 1rem; font-size: 0.9rem; }
+.cms-menu__icon { margin-right: 0.35rem; }
+.cms-menu__arrow { font-size: 0.7rem; opacity: 0.55; transition: transform 0.2s; display: inline-block; }
+.cms-menu__arrow--open { transform: rotate(180deg); }
+.cms-menu__item--cart { display: flex; align-items: center; margin-left: auto; }
+
+/* Burger spans */
+.cms-burger { background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 6px; color: inherit; display: none; flex-direction: column; justify-content: center; gap: 5px; width: 40px; height: 40px; flex-shrink: 0; }
+.cms-burger span { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.25s, opacity 0.2s; transform-origin: center; }
+.cms-burger--open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.cms-burger--open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.cms-burger--open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Overlay */
+.cms-menu-overlay { display: none; }
+.cms-menu-overlay--open { display: block; position: fixed; inset: 0; background: var(--vbwd-cms-menu-overlay, rgba(0,0,0,0.4)); z-index: 250; }
+
+/* Desktop: horizontal row */
+@media (min-width: 769px) {
+  .cms-menu { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .cms-menu__sub { position: absolute; top: 100%; left: 0; background: var(--color-surface, #fff); border: 1px solid var(--color-border, #e5e7eb); border-radius: 6px; min-width: 160px; z-index: 300; box-shadow: 0 4px 12px var(--vbwd-cms-menu-dropdown-shadow, rgba(0,0,0,0.1)); }
+}
+
+/* Mobile: burger drawer. The burger sits above the drawer (300) and the
+   overlay (250) so its morph-into-X stays visible. */
+@media (max-width: 768px) {
+  .cms-burger { display: flex; position: relative; z-index: 400; }
+  .cms-menu { display: flex; flex-direction: column; align-items: stretch; position: fixed; top: 0; left: -100%; width: min(300px, 85vw); height: 100dvh; background: var(--color-bg, #fff); padding: 4rem 0 2rem; overflow-y: auto; z-index: 300; transition: left 0.28s ease; box-shadow: 4px 0 20px var(--vbwd-cms-menu-drawer-shadow, rgba(0,0,0,0.15)); }
+  .cms-menu--open { left: 0; }
+  .cms-menu__item { position: static; border-bottom: 1px solid var(--color-border, #e5e7eb); }
+  .cms-menu__link { padding: 0.9rem 1.5rem; font-size: 1rem; justify-content: space-between; white-space: normal; }
+  .cms-menu__sub { position: static; box-shadow: none; border: none; border-radius: 0; max-height: 0; overflow: hidden; display: block; transition: max-height 0.25s ease; }
+  .cms-menu__sub--open { max-height: 400px; }
+  .cms-menu__sub .cms-menu__link { padding-left: 2.5rem; font-size: 0.9rem; opacity: 0.85; }
+}
+
+/* Slideshow */
+.cms-slideshow { position: relative; overflow: hidden; }
+.cms-slide { display: none; }
+.cms-slide--active { display: block; }
+.cms-slide__img { width: 100%; height: auto; display: block; }
+.cms-slide__caption { text-align: center; font-size: 0.875rem; padding: 0.5rem; opacity: 0.7; }
+.cms-slide__prev,
+.cms-slide__next { position: absolute; top: 50%; transform: translateY(-50%); background: var(--vbwd-cms-slideshow-arrow-bg, rgba(0,0,0,0.4)); color: var(--color-overlay-fg, #fff); border: none; font-size: 2rem; cursor: pointer; padding: 0.25rem 0.75rem; border-radius: 3px; line-height: 1; }
+.cms-slide__prev { left: 0.5rem; }
+.cms-slide__next { right: 0.5rem; }

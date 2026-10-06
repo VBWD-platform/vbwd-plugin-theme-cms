@@ -1,0 +1,16 @@
+{#- CmsEmbedArchive: the chrome-light category archive for the mobile WebView.
+    PostCards link back into embed mode. -#}
+{% extends "cms/document.html.j2" %}
+{% block cms_content %}
+<div class="cms-embed-archive">
+{%- if is_empty %}
+  <div class="cms-embed-archive__empty" data-testid="cms-embed-archive-empty" role="alert">
+    <h1 class="cms-embed-archive__empty-title">{{ _('cms.embed.notFoundTitle') }}</h1>
+    <p class="cms-embed-archive__empty-message">{{ _('cms.embed.notFoundMessage') }}</p>
+  </div>
+{%- else %}
+{% include "cms/components/_post_list.html.j2" %}
+{%- if pagination %}{% with class_base = "cms-embed-archive", testid_base = "cms-embed-archive" %}{% include "cms/components/_pagination.html.j2" %}{% endwith %}{% endif %}
+{%- endif %}
+</div>
+{% endblock %}

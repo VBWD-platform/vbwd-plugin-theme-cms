@@ -1,0 +1,10 @@
+{#- CmsBreadcrumb → core VbwdBreadcrumb.vue markup. -#}
+{%- set breadcrumb = component_context -%}
+<nav class="vbwd-breadcrumb" aria-label="breadcrumb">
+{%- if breadcrumb.css %}<style>{{ breadcrumb.css }}</style>{% endif -%}
+{%- for crumb in breadcrumb.crumbs -%}
+{%- if not loop.first %}<span class="vbwd-breadcrumb__separator" aria-hidden="true">{{ breadcrumb.separator }}</span>{% endif -%}
+{%- if crumb.href %}<a href="{{ crumb.href }}" class="vbwd-breadcrumb__link">{{ crumb.label }}</a>
+{%- else %}<span class="vbwd-breadcrumb__current">{{ crumb.label }}</span>{% endif -%}
+{%- endfor -%}
+</nav>

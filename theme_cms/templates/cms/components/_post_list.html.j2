@@ -1,0 +1,8 @@
+{#- PostList.vue — data-in (never fetches); expects ``post_list`` = {mode, cards}. -#}
+<div class="post-list post-list--{{ post_list.mode }}">
+{%- if not post_list.cards -%}
+<p class="post-list__empty" data-testid="post-list-empty">{{ _('cms.postList.empty') }}</p>
+{%- else -%}
+{%- for card in post_list.cards %}{% include "cms/components/_post_card.html.j2" %}{% endfor -%}
+{%- endif -%}
+</div>

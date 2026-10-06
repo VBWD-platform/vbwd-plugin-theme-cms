@@ -1,0 +1,12 @@
+{#- CmsLayoutRenderer: areas in layout order. Every non-content area is a
+    personalised region (D12) so /regions re-renders it with the viewer's token
+    (the cms API applies required_access_level_ids). -#}
+<div class="cms-layout cms-layout--{{ cms_layout.slug }}">
+{%- for area in cms_layout.areas %}
+{%- if area.is_content %}
+{% include ["cms/areas/content.html.j2"] %}
+{%- else %}
+{% region %}{% include ["cms/areas/" ~ area.type ~ ".html.j2", "cms/areas/_default.html.j2"] %}{% endregion %}
+{%- endif %}
+{%- endfor %}
+</div>

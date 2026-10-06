@@ -1,0 +1,26 @@
+{#- NativePricingPlans → landing1 Landing1View.vue. "Choose" / "Retry" are buttons
+    of GET forms, so they work without JS. -#}
+{%- set pricing = component_context -%}
+{%- if pricing.css %}<style data-native-pricing-css>{{ pricing.css }}</style>{% endif -%}
+<div class="landing1 landing1--{{ pricing.theme }}" data-testid="landing1-root">
+<div class="landing1-header"><h1 data-testid="landing1-title">{{ pricing.heading or _('landing1.title') }}</h1><p class="subtitle">{{ pricing.subtitle or _('landing1.subtitle') }}</p></div>
+{%- if pricing.error -%}
+<div class="error-state" data-testid="landing1-error"><p>{{ pricing.error }}</p><form method="get" action="{{ pricing.retry_href }}"><button type="submit" class="retry-btn">{{ _('common.retry') }}</button></form></div>
+{%- elif not pricing.plans -%}
+<div class="empty-state" data-testid="landing1-empty"><p>{{ _('landing1.noPlans') }}</p></div>
+{%- else -%}
+<div class="plans-grid" data-testid="landing1-plans">
+{%- for plan in pricing.plans -%}
+<div class="plan-card{% if plan.is_featured %} plan-card--featured{% endif %}" data-testid="plan-card-{{ plan.slug }}">
+{%- if plan.is_featured %}<div class="plan-card__badge" data-testid="plan-card-badge">{{ pricing.badge or _('landing1.popular') }}</div>{% endif -%}
+{%- if pricing.image_url %}<img class="plan-card__image" src="{{ pricing.image_url }}" alt="{{ plan.name }}">{% endif -%}
+<h2 class="plan-name">{{ plan.name }}</h2>
+<div class="plan-price"><span class="plan-price__amount">{{ plan.price_label }}</span>{% if plan.billing_label %}<span class="billing-period">/{{ plan.billing_label }}</span>{% endif %}</div>
+{%- if plan.description %}<p class="plan-description">{{ plan.description }}</p>{% endif -%}
+{%- if pricing.features %}<ul class="plan-features" data-testid="plan-features">{% for feature in pricing.features %}<li class="plan-features__item"><svg class="plan-features__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 13.5 4 10l-1.2 1.2L7.5 16 17 6.5 15.8 5.3z" fill="currentColor"></path></svg><span>{{ feature }}</span></li>{% endfor %}</ul>{% endif -%}
+<form method="get" action="/checkout"><input type="hidden" name="tarif_plan_id" value="{{ plan.slug }}"><button type="submit" class="choose-plan-btn" data-testid="choose-plan-{{ plan.slug }}">{{ pricing.cta_label or _('landing1.choosePlan') }}</button></form>
+</div>
+{%- endfor -%}
+</div>
+{%- endif -%}
+</div>

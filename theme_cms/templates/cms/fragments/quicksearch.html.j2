@@ -1,0 +1,9 @@
+{#- The quick-search dropdown (PostSearch.vue listbox). Closed = an empty placeholder
+    without the dropdown testid (the SPA renders nothing then). -#}
+{%- if options -%}
+<ul id="{{ listbox_id }}" class="post-search__dropdown" role="listbox" data-testid="post-search-dropdown">
+{%- for option in options %}<li id="{{ listbox_id }}-option-{{ loop.index0 }}" class="post-search__option" role="option" aria-selected="false" data-testid="post-search-option" data-href="{{ option.href }}">{{ option.title }}</li>{% endfor -%}
+</ul>
+{%- else -%}
+<ul id="{{ listbox_id }}" class="post-search__dropdown" role="listbox" hidden></ul>
+{%- endif -%}

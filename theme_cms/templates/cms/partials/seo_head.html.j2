@@ -1,0 +1,22 @@
+{#- The SPA's injectSeoMeta tags (same order, same data-seo="ssr" marker). -#}
+{%- if cms_seo.description %}
+  <meta name="description" content="{{ cms_seo.description }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.robots %}
+  <meta name="robots" content="{{ cms_seo.robots }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.canonical_url %}
+  <link rel="canonical" href="{{ cms_seo.canonical_url }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.og_title %}
+  <meta property="og:title" content="{{ cms_seo.og_title }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.og_description %}
+  <meta property="og:description" content="{{ cms_seo.og_description }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.og_image %}
+  <meta property="og:image" content="{{ cms_seo.og_image }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.schema_json %}
+  <script type="application/ld+json" data-seo="ssr">{{ cms_seo.schema_json }}</script>
+{%- endif %}

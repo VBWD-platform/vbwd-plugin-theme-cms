@@ -1,0 +1,8 @@
+{#- CmsPage access-denied state; identity-dependent, so it is a region. -#}
+{% extends "cms/document.html.j2" %}
+{% block cms_content %}
+{%- region %}<div class="cms-page__access-denied">
+{%- if viewer.user_id %}<h2>{{ _('cms.accessDenied') }}</h2><p>{{ _('cms.upgradePlan') }}</p>
+{%- else %}<h2>{{ _('cms.loginRequired') }}</h2><p>{{ _('cms.loginToView') }}</p><a href="/login" class="cms-page__login-link">{{ _('common.login') }}</a>
+{%- endif %}</div>{% endregion %}
+{%- endblock %}

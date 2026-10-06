@@ -1,0 +1,7 @@
+{#- fe-core TagChips + CustomFieldsDisplay; ``extra_class`` lands on the root (Vue class merge). -#}
+{%- macro tag_chips(tags, extra_class='') -%}
+{%- if tags %}<div class="vbwd-tag-chips{% if extra_class %} {{ extra_class }}{% endif %}" data-testid="tag-chips">{% for tag in tags %}<span class="vbwd-tag-chip" data-testid="tag-chip">{{ tag }}</span>{% endfor %}</div>{% endif -%}
+{%- endmacro -%}
+{%- macro custom_fields_display(rows, extra_class='') -%}
+{%- if rows %}<dl class="vbwd-custom-fields-display{% if extra_class %} {{ extra_class }}{% endif %}" data-testid="custom-fields-display">{% for row in rows %}<div class="vbwd-custom-field-row" data-testid="custom-field-row"><dt class="vbwd-custom-field-label">{{ row.label }}</dt><dd class="vbwd-custom-field-value">{{ row.display }}</dd></div>{% endfor %}</dl>{% endif -%}
+{%- endmacro -%}

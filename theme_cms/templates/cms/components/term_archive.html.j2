@@ -1,0 +1,20 @@
+{#- TermArchiveWidget.vue — every category / tag archive and the prefix archives. -#}
+{%- set archive = component_context -%}
+<div class="term-archive">
+{%- if archive.mode == 'prompt' -%}
+<p class="term-archive__hint" data-testid="term-archive-prompt">{{ _('cms.termArchive.prompt') }}</p>
+{%- else -%}
+<header class="term-archive__header"><h1 class="term-archive__heading" data-testid="term-archive-heading">{{ archive.heading }}</h1>
+{%- if archive.description %}<p class="term-archive__description" data-testid="term-archive-description">{{ archive.description }}</p>{% endif -%}
+</header>
+{%- if archive.is_empty -%}
+<p class="term-archive__empty" data-testid="term-archive-empty">
+{%- if archive.mode == 'archive' %}{{ _('cms.termArchive.emptyArchive') }}{% elif archive.mode == 'tag' %}{{ _('cms.termArchive.emptyTag') }}{% else %}{{ _('cms.termArchive.emptyCategory') }}{% endif -%}
+</p>
+{%- else -%}
+{%- set post_list = archive.post_list -%}
+{%- include "cms/components/_post_list.html.j2" -%}
+{%- if archive.pagination %}{% with pagination = archive.pagination, class_base = "term-archive", testid_base = "term-archive" %}{% include "cms/components/_pagination.html.j2" %}{% endwith %}{% endif -%}
+{%- endif -%}
+{%- endif -%}
+</div>

@@ -1,0 +1,25 @@
+{#- CmsPageIndex: category filter + the published pages; links instead of buttons so
+    it works without JS. -#}
+{% extends "cms/document.html.j2" %}
+{% block cms_content %}
+<div class="cms-index">
+  <div class="cms-index__categories">
+    <a class="cms-index__cat-btn{% if not active_category %} active{% endif %}" href="/pages">{{ _('cms.allCategories') }}</a>
+    {%- for category in categories %}
+    <a class="cms-index__cat-btn{% if active_category == category.slug %} active{% endif %}" href="/pages?category={{ category.slug|urlencode }}">{{ category.name }}</a>
+    {%- endfor %}
+  </div>
+  {%- if not listing['items'] %}
+  <div class="cms-index__empty">{{ _('cms.noPages') }}</div>
+  {%- else %}
+  <ul class="cms-index__list">
+    {%- for item in listing['items'] %}
+    <li class="cms-index__item"><a href="/{{ item.slug }}"><strong>{{ item.title or item.name }}</strong></a>{% if item.meta_description %}<p class="cms-index__desc">{{ item.meta_description }}</p>{% endif %}</li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+  {%- if listing.pages > 1 %}
+  <div class="cms-index__pagination"><span>{{ listing.page }} / {{ listing.pages }}</span></div>
+  {%- endif %}
+</div>
+{% endblock %}

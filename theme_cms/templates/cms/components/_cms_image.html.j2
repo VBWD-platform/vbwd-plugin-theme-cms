@@ -1,0 +1,4 @@
+{#- CmsImage.vue: explicit dimensions (CLS), lazy, async decoding. -#}
+{%- macro cms_image(image, alt) -%}
+<picture class="cms-image"><img class="cms-image__img" src="{{ image.url }}" alt="{{ alt }}" width="{{ image.width }}" height="{{ image.height }}" loading="lazy" fetchpriority="auto" decoding="async"></picture>
+{%- endmacro -%}
