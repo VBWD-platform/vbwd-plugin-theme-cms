@@ -7,6 +7,8 @@ more specific adapter page (``/shop``) wins over the catch-all anyway.
 """
 from typing import Any, Dict, List, Mapping
 
+from flask import abort
+
 from plugins.theme.theme.page_registry import PUBLIC_PAGE, SPA_ONLY_PREFIXES, ThemePage
 from plugins.theme.theme.theme_api import FORBIDDEN, NOT_FOUND, ThemeApiError
 from plugins.theme.theme.theme_request import ThemeRequest
@@ -31,6 +33,24 @@ CATEGORY_TERM_TYPE = "category"
 PAGE_POST_TYPE = "page"
 EMBED_ARCHIVE_META_FIELDS = ("published_at",)
 
+# Public fe-user SPA routes that no theme adapter renders, so they reach the
+# catch-all ``/<path:slug>``. The catch-all hands them back with a PLAIN 404 (no
+# not-found label) and nginx serves the SPA shell. Segment-wise prefixes, like
+# SPA_ONLY_PREFIXES. A route missing here still works for users (nginx serves
+# the SPA shell) but answers HTTP 404 — keep this in sync with the fe-user routes.
+# A more specific themed rule (``/pay/stripe``) still wins over the catch-all.
+SPA_APP_ROUTE_PREFIXES = (
+    "/index.html",  # core router: redirect to home
+    "/pay",  # payment plugins: /pay/<provider>[/success|/cancel|/voucher]
+    "/ghrm",  # ghrm: /ghrm/auth/github/callback
+    "/software",  # ghrm catalogue base (default ``catalogue_page_slug``)
+    "/s",  # office: /s/:token public share
+    "/landing1",  # landing1
+    "/embed/landing1",  # landing1 embed
+    "/pharmacy",  # shop-pharma
+    "/marketplace",  # marketplace vendor area
+)
+
 
 def _page_number(query_args: Mapping[str, Any]) -> int:
     try:
@@ -53,9 +73,10 @@ def embed_archive_view(listing: Mapping[str, Any], post_type: str) -> Dict[str, 
     }
 
 
-def _is_spa_only_path(path: str) -> bool:
+def _is_spa_path(path: str) -> bool:
     return any(
-        path == prefix or path.startswith(prefix + "/") for prefix in SPA_ONLY_PREFIXES
+        path == prefix or path.startswith(prefix + "/")
+        for prefix in SPA_ONLY_PREFIXES + SPA_APP_ROUTE_PREFIXES
     )
 
 
@@ -123,8 +144,10 @@ class CmsPages:
 
     def slug_page_context(self, theme_request: ThemeRequest) -> Dict[str, Any]:
         slug = theme_request.view_args["slug"]
-        if _is_spa_only_path(f"/{slug}"):
-            raise ThemeApiError(NOT_FOUND, "an SPA-only path is never themed")
+        if _is_spa_path(f"/{slug}"):
+            # A plain, unlabelled 404 (not ThemeApiError → labelled themed 404):
+            # nginx falls back to the SPA, which owns this path.
+            abort(NOT_FOUND)
         return self._cms_page_context(theme_request, CmsApi(theme_request), slug)
 
     def cms_slug_page_context(

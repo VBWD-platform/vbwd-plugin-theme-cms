@@ -11,6 +11,10 @@ import uuid
 
 import pytest
 
+from plugins.theme.theme.page_rendering import (
+    NOT_FOUND_LABEL_HEADER,
+    NOT_FOUND_LABEL_HEADER_VALUE,
+)
 from plugins.theme_cms.tests.integration.cms_seed import unique
 
 RENDER = {"X-VBWD-Render": "1"}
@@ -98,8 +102,20 @@ def test_a_path_prefix_resolves_to_the_prefix_archive(client, cms):
     )
 
 
-def test_an_unknown_slug_is_a_404_so_nginx_falls_back_to_the_spa(client):
-    assert _get(client, f"/{unique('nothing-here')}").status_code == 404
+def test_an_unknown_slug_is_a_labelled_404_so_nginx_answers_a_real_404(client):
+    response = _get(client, f"/{unique('nothing-here')}")
+
+    assert response.status_code == 404
+    assert response.headers.get(NOT_FOUND_LABEL_HEADER) == NOT_FOUND_LABEL_HEADER_VALUE
+
+
+def test_a_real_cms_page_is_a_200_without_the_not_found_label(client, cms):
+    page = cms.post()
+
+    response = _get(client, f"/{page['slug']}")
+
+    assert response.status_code == 200
+    assert NOT_FOUND_LABEL_HEADER not in response.headers
 
 
 def test_a_draft_previews_with_its_token_and_a_wrong_token_is_access_denied(
@@ -324,7 +340,44 @@ def test_a_more_specific_themed_page_wins_over_the_catch_all(client):
 def test_the_catch_all_never_answers_spa_only_paths(client, cms):
     cms.post(slug="dashboard/x")
 
-    assert _get(client, "/dashboard/x").status_code == 404
+    response = _get(client, "/dashboard/x")
+
+    assert response.status_code == 404
+    assert NOT_FOUND_LABEL_HEADER not in response.headers
+
+
+@pytest.mark.parametrize(
+    "spa_path",
+    [
+        "/tuktuk",
+        "/index.html",
+        "/pay/yookassa",
+        "/pay/conekta/voucher",
+        "/ghrm/auth/github/callback",
+        "/software",
+        "/software/some-package",
+        "/s/share-token",
+        "/landing1",
+        "/embed/landing1",
+        "/pharmacy/p/aspirin",
+        "/marketplace/listings",
+    ],
+)
+def test_the_catch_all_hands_spa_app_routes_back_unlabelled(client, spa_path):
+    response = _get(client, spa_path)
+
+    assert response.status_code == 404
+    assert NOT_FOUND_LABEL_HEADER not in response.headers
+
+
+@pytest.mark.parametrize("junk_path", ["/pharmacyx", "/landing1x/y", "/My.vue"])
+def test_a_path_only_sharing_a_prefix_with_an_app_route_is_a_labelled_404(
+    client, junk_path
+):
+    response = _get(client, junk_path)
+
+    assert response.status_code == 404
+    assert response.headers.get(NOT_FOUND_LABEL_HEADER) == NOT_FOUND_LABEL_HEADER_VALUE
 
 
 def test_the_catch_all_answers_only_nginx_marked_requests(client, cms):
