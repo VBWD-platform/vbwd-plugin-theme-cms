@@ -5,7 +5,9 @@ fe-user mounts ``/shop/product/:slug`` as ``CmsPage`` with the fixed prop
 widgets inside it read the ROUTE's params (the product slug). The themed seam
 ``CmsPages.cms_slug_page_context(theme_request, cms_slug)`` does the same: it
 resolves ``cms_slug`` and hands the request's own ``view_args`` to every
-component as its route params.
+component as its route params. An adapter may pass ``SeoOverrides`` so the
+route keeps its own SEO head; only then is core's public ``site_name`` read
+(``GET /api/v1/config``) for the title suffix.
 """
 import json
 from types import MappingProxyType
@@ -17,6 +19,7 @@ from plugins.theme.theme import theme_api
 from plugins.theme.theme.theme_api import ThemeApiError
 from plugins.theme.theme.viewer import ANONYMOUS_VIEWER
 from plugins.theme_cms.theme_cms import cms_api as cms_api_module
+from plugins.theme_cms.theme_cms.page_context import SeoOverrides
 from plugins.theme_cms.theme_cms.pages import CmsPages
 from plugins.theme_cms.theme_cms.registries import (
     ComponentTemplate,
@@ -49,6 +52,7 @@ ANSWERS = {
     },
     "/api/v1/cms/layouts/layout-1": LAYOUT,
     "/api/v1/cms/config": {"home_slug": "index"},
+    "/api/v1/config": {"site_name": "VBWD"},
 }
 
 
@@ -124,3 +128,37 @@ def test_an_unknown_cms_page_is_a_404_for_the_spa_fallback(client):
         _cms_pages().cms_slug_page_context(_ThemeRequest({}), "no-such-page")
 
     assert raised.value.status == 404
+
+
+def test_seo_overrides_reach_the_head_with_the_core_site_name(client):
+    overrides = SeoOverrides(title="Mug", canonical_path="/shop/product/mug")
+
+    with Flask(__name__).app_context():
+        context = _cms_pages().cms_slug_page_context(
+            _ThemeRequest({"slug": "mug"}), "shop-product-detail", overrides
+        )
+
+    assert context["page_title"] == "Mug — VBWD"
+    assert context["cms_seo"]["canonical_url"] == "/shop/product/mug"
+    assert _component_context(context) == {"route_params": {"slug": "mug"}}
+
+
+def test_without_seo_overrides_the_core_config_is_never_read(client):
+    with Flask(__name__).app_context():
+        context = _cms_pages().cms_slug_page_context(
+            _ThemeRequest({"slug": "mug"}), "shop-product-detail"
+        )
+
+    assert context["page_title"] == "Product"
+    assert "/api/v1/config" not in client.paths
+
+
+def test_an_unreadable_core_config_leaves_the_title_unsuffixed(client, monkeypatch):
+    monkeypatch.delitem(ANSWERS, "/api/v1/config")
+
+    with Flask(__name__).app_context():
+        context = _cms_pages().cms_slug_page_context(
+            _ThemeRequest({}), "shop-product-detail", SeoOverrides(title="Mug")
+        )
+
+    assert context["page_title"] == "Mug"

@@ -10,6 +10,10 @@
 * SEO head fields (``injectSeoMeta``): title = meta_title || name || title,
   og:title falls back to the title; canonical follows the cms rule (stored
   override, else ``public_base_url`` + ``/<slug>``, ``/`` for the home slug);
+* an adapter route's ``SeoOverrides`` replace the template page's SEO head field
+  by field (``None`` keeps the page's value): the title gets the site-name suffix,
+  site-relative canonical / image URLs become absolute, a canonical override also
+  sets og:url and drops the template's language alternates;
 * ``language_alternates`` = the W3 ``translations``; ``page_language`` = post language;
 * the post hero: on unless ``type_data.show_featured_hero`` is false, tag terms
   only, image URL stripped of CSS-breakout characters.
@@ -19,6 +23,7 @@ import base64
 from plugins.theme_cms.theme_cms.page_context import (
     CmsPageContextBuilder,
     CmsSiteSettings,
+    SeoOverrides,
     derive_canonical_url,
 )
 from plugins.theme_cms.theme_cms.page_resolver import ResolvedCmsPage
@@ -34,13 +39,14 @@ SITE = CmsSiteSettings(
 )
 
 
-def _build(page, layout=None, style_css=None, site=SITE):
+def _build(page, layout=None, style_css=None, site=SITE, seo_overrides=None):
     builder = CmsPageContextBuilder(
         default_page_type_registry(),
         ComponentTemplateRegistry(),
         site,
         route_params={"slug": page.get("slug")},
         theme_request=None,
+        seo_overrides=seo_overrides,
     )
     return builder.build(ResolvedCmsPage(page, layout, style_css))
 
@@ -269,3 +275,90 @@ def test_core_tags_and_custom_fields_rows():
         {"label": "OK?", "display": "Yes"},
     ]
     assert _build(_page())["cms_tags_custom_fields"] is None
+
+
+TEMPLATE_PAGE = {
+    "id": "t",
+    "slug": "shop-product-detail",
+    "type": "page",
+    "title": "Product",
+    "meta_title": "Product",
+    "meta_description": "Product details",
+    "robots": "noindex,follow",
+    "og_title": "Product OG",
+    "og_description": "Template OG description",
+    "og_image_url": "https://site.example/template.png",
+    "translations": [
+        {"language": "de", "url": "https://site.example/de/shop-product-detail"}
+    ],
+}
+BRANDED_SITE = CmsSiteSettings(
+    public_base_url="https://site.example/",
+    home_slug="index",
+    global_head_html="",
+    site_name="VBWD",
+)
+
+
+def test_seo_overrides_replace_the_template_page_head():
+    overrides = SeoOverrides(
+        title="CleanUp Bot",
+        description="A bot to clean up your workspace.",
+        robots="index,follow",
+        canonical_path="/shop/product/cleanup-bot",
+        image_url="/uploads/images/bot.png",
+        og_type="product",
+    )
+
+    context = _build(TEMPLATE_PAGE, site=BRANDED_SITE, seo_overrides=overrides)
+
+    canonical = "https://site.example/shop/product/cleanup-bot"
+    assert context["page_title"] == "CleanUp Bot — VBWD"
+    assert context["current_url"] == canonical
+    assert context["language_alternates"] == []
+    assert context["cms_seo"] == {
+        "description": "A bot to clean up your workspace.",
+        "robots": "index,follow",
+        "canonical_url": canonical,
+        "og_title": "CleanUp Bot — VBWD",
+        "og_description": "A bot to clean up your workspace.",
+        "og_image": "https://site.example/uploads/images/bot.png",
+        "og_type": "product",
+        "og_url": canonical,
+        "schema_json": None,
+    }
+
+
+def test_absent_seo_overrides_fall_back_to_the_template_page():
+    context = _build(
+        TEMPLATE_PAGE,
+        site=BRANDED_SITE,
+        seo_overrides=SeoOverrides(canonical_path="/shop/category/audio"),
+    )
+
+    seo = context["cms_seo"]
+    assert context["page_title"] == "Product"
+    assert seo["description"] == "Product details"
+    assert seo["robots"] == "noindex,follow"
+    assert seo["og_title"] == "Product OG"
+    assert seo["og_description"] == "Template OG description"
+    assert seo["og_image"] == "https://site.example/template.png"
+    assert seo["og_type"] is None
+    assert seo["canonical_url"] == seo["og_url"]
+    assert seo["og_url"] == "https://site.example/shop/category/audio"
+
+
+def test_an_overridden_title_without_a_site_name_is_the_subject_alone():
+    context = _build(TEMPLATE_PAGE, seo_overrides=SeoOverrides(title="Mug"))
+
+    assert context["page_title"] == "Mug"
+    assert context["cms_seo"]["og_title"] == "Mug"
+    assert context["language_alternates"] == TEMPLATE_PAGE["translations"]
+    assert context["cms_seo"]["og_url"] is None
+
+
+def test_a_page_without_overrides_emits_no_og_type_or_og_url():
+    seo = _build(TEMPLATE_PAGE, site=BRANDED_SITE)["cms_seo"]
+
+    assert seo["og_type"] is None and seo["og_url"] is None
+    assert seo["canonical_url"] == "https://site.example/shop-product-detail"

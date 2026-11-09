@@ -17,6 +17,12 @@
 {%- if cms_seo.og_image %}
   <meta property="og:image" content="{{ cms_seo.og_image }}" data-seo="ssr">
 {%- endif %}
+{%- if cms_seo.og_type %}
+  <meta property="og:type" content="{{ cms_seo.og_type }}" data-seo="ssr">
+{%- endif %}
+{%- if cms_seo.og_url %}
+  <meta property="og:url" content="{{ cms_seo.og_url }}" data-seo="ssr">
+{%- endif %}
 {%- if cms_seo.schema_json %}
   <script type="application/ld+json" data-seo="ssr">{{ cms_seo.schema_json }}</script>
 {%- endif %}

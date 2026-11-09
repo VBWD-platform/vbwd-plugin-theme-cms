@@ -5,19 +5,24 @@ routes and the catch-all ``/<path:slug>`` registered with the LOWEST priority.
 Werkzeug matches by rule specificity, not registration order, so any static or
 more specific adapter page (``/shop``) wins over the catch-all anyway.
 """
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List, Mapping, Optional
 
 from flask import abort
 
 from plugins.theme.theme.page_registry import PUBLIC_PAGE, SPA_ONLY_PREFIXES, ThemePage
-from plugins.theme.theme.theme_api import FORBIDDEN, NOT_FOUND, ThemeApiError
+from plugins.theme.theme.theme_api import (
+    FORBIDDEN,
+    NOT_FOUND,
+    ThemeApiError,
+    call_api,
+)
 from plugins.theme.theme.theme_request import ThemeRequest
 
 from .cms_api import CmsApi
 from .components.archives import pagination
 from .components.post_card import archive_display, post_list_view
 from .language_policy import read_cms_config
-from .page_context import CmsPageContextBuilder, CmsSiteSettings
+from .page_context import CmsPageContextBuilder, CmsSiteSettings, SeoOverrides
 from .page_resolver import CmsPageResolver
 from .registries import ComponentTemplateRegistry, PageTypeTemplateRegistry
 
@@ -32,6 +37,7 @@ FIRST_PAGE = 1
 CATEGORY_TERM_TYPE = "category"
 PAGE_POST_TYPE = "page"
 EMBED_ARCHIVE_META_FIELDS = ("published_at",)
+CORE_PUBLIC_CONFIG_PATH = "/api/v1/config"
 
 # Public fe-user SPA routes that no theme adapter renders, so they reach the
 # catch-all ``/<path:slug>``. The catch-all hands them back with a PLAIN 404 (no
@@ -71,6 +77,15 @@ def embed_archive_view(listing: Mapping[str, Any], post_type: str) -> Dict[str, 
             listing.get("page") or FIRST_PAGE, listing.get("pages") or FIRST_PAGE
         ),
     }
+
+
+def _core_site_name(theme_request: ThemeRequest) -> str:
+    """Core's white-label ``site_name`` (public config); empty when unset or unreadable."""
+    try:
+        public_config = call_api(theme_request, "GET", CORE_PUBLIC_CONFIG_PATH)
+    except ThemeApiError:
+        return ""
+    return str(public_config.get("site_name") or "")
 
 
 def _is_spa_path(path: str) -> bool:
@@ -151,16 +166,26 @@ class CmsPages:
         return self._cms_page_context(theme_request, CmsApi(theme_request), slug)
 
     def cms_slug_page_context(
-        self, theme_request: ThemeRequest, cms_slug: str
+        self,
+        theme_request: ThemeRequest,
+        cms_slug: str,
+        seo_overrides: Optional[SeoOverrides] = None,
     ) -> Dict[str, Any]:
         """An adapter route rendered inside the CMS page ``cms_slug`` (fe-user
         ``CmsPage`` with a fixed ``slug`` prop): the page is chosen by
         ``cms_slug``, its widgets read the route's own params (S152-06 §7).
+        ``seo_overrides`` give the route its own SEO head instead of the template's.
         """
-        return self._cms_page_context(theme_request, CmsApi(theme_request), cms_slug)
+        return self._cms_page_context(
+            theme_request, CmsApi(theme_request), cms_slug, seo_overrides
+        )
 
     def _cms_page_context(
-        self, theme_request: ThemeRequest, cms_api: CmsApi, slug: str
+        self,
+        theme_request: ThemeRequest,
+        cms_api: CmsApi,
+        slug: str,
+        seo_overrides: Optional[SeoOverrides] = None,
     ) -> Dict[str, Any]:
         try:
             resolved = CmsPageResolver(cms_api).resolve(
@@ -175,6 +200,9 @@ class CmsPages:
             public_base_url=str(cms_config.get("public_base_url") or ""),
             home_slug=str(cms_api.site_config().get("home_slug") or DEFAULT_HOME_SLUG),
             global_head_html=str(cms_config.get("global_head_html") or ""),
+            site_name=_core_site_name(theme_request)
+            if seo_overrides and seo_overrides.title
+            else "",
         )
         builder = CmsPageContextBuilder(
             self._page_type_registry,
@@ -182,6 +210,7 @@ class CmsPages:
             site_settings,
             theme_request.view_args,
             theme_request,
+            seo_overrides,
         )
         return builder.build(resolved)
 

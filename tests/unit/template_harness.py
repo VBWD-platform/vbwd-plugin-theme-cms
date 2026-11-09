@@ -39,13 +39,16 @@ def theme_plugin() -> ThemePlugin:
     return plugin
 
 
-def page_context(page, layout=None, style_css=None, component_registry=None):
+def page_context(
+    page, layout=None, style_css=None, component_registry=None, seo_overrides=None
+):
     builder = CmsPageContextBuilder(
         default_page_type_registry(),
         component_registry or ComponentTemplateRegistry(),
         SITE,
         route_params={"slug": page.get("slug")},
         theme_request=None,
+        seo_overrides=seo_overrides,
     )
     context = builder.build(ResolvedCmsPage(page, layout, style_css))
     context["language"] = context.pop("page_language", "en")

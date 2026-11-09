@@ -12,6 +12,7 @@ import re
 import pytest
 
 from plugins.theme.theme.viewer import Viewer
+from plugins.theme_cms.theme_cms.page_context import SeoOverrides
 from plugins.theme_cms.theme_cms.registries import (
     ComponentTemplate,
     ComponentTemplateRegistry,
@@ -506,6 +507,41 @@ def test_head_seo_tags_style_cascade_and_head_snippets(plugin):
     layout_head = head.index("window.layoutHead=1")
     global_head = head.index('name="site-verification"')
     assert stylesheet < page_style < layout_head < global_head
+
+
+def test_head_carries_og_type_and_og_url_only_from_seo_overrides(plugin):
+    page = _laid_out_page(meta_title="Product", robots="noindex,follow")
+    overrides = SeoOverrides(
+        title="Mug",
+        robots="index,follow",
+        canonical_path="/shop/product/mug",
+        image_url="/uploads/mug.png",
+        og_type="product",
+    )
+
+    plain_head = render(plugin, page_context(page, layout=LAYOUT)).partition("</head>")[
+        0
+    ]
+    head = render(
+        plugin, page_context(page, layout=LAYOUT, seo_overrides=overrides)
+    ).partition("</head>")[0]
+
+    assert "og:type" not in plain_head and "og:url" not in plain_head
+    assert "<title>Mug</title>" in head
+    assert '<meta name="robots" content="index,follow" data-seo="ssr">' in head
+    assert (
+        '<link rel="canonical" href="https://site.example/shop/product/mug" '
+        'data-seo="ssr">' in head
+    )
+    assert '<meta property="og:type" content="product" data-seo="ssr">' in head
+    assert (
+        '<meta property="og:url" content="https://site.example/shop/product/mug" '
+        'data-seo="ssr">' in head
+    )
+    assert (
+        '<meta property="og:image" content="https://site.example/uploads/mug.png" '
+        'data-seo="ssr">' in head
+    )
 
 
 def test_hreflang_and_switcher_from_the_translations(plugin):
