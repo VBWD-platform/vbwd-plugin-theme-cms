@@ -516,3 +516,39 @@ def test_adapters_reach_the_component_registry(app):
     with app.app_context():
         registry = resolve_component_template_registry()
         assert registry is app.plugin_manager.get_plugin("theme_cms").component_registry
+
+
+# ── S154 D7: a switched-off cms type is noindex,follow in the themed head ────
+
+SWITCHED_OFF_ROBOTS_META = (
+    '<meta name="robots" content="noindex,follow" data-seo="ssr">'
+)
+
+
+def test_a_category_archive_is_noindex_follow_while_categories_are_off(
+    client, cms, cms_config
+):
+    term_slug = unique("cat")
+    cms.term("category", "D7 Cat", term_slug)
+
+    default_html = _get(client, f"/category/{term_slug}").get_data(as_text=True)
+    cms_config["seo_index_categories"] = True
+    switched_on_html = _get(client, f"/category/{term_slug}").get_data(as_text=True)
+
+    assert SWITCHED_OFF_ROBOTS_META in default_html
+    assert '<meta name="robots" content="index,follow" data-seo="ssr">' in (
+        switched_on_html
+    )
+
+
+def test_a_page_is_noindex_follow_while_pages_are_off(client, cms, cms_config):
+    page = cms.post(robots="index,follow")
+
+    indexable_html = _get(client, f"/{page['slug']}").get_data(as_text=True)
+    cms_config["seo_index_pages"] = False
+    switched_off_html = _get(client, f"/{page['slug']}").get_data(as_text=True)
+
+    assert '<meta name="robots" content="index,follow" data-seo="ssr">' in (
+        indexable_html
+    )
+    assert SWITCHED_OFF_ROBOTS_META in switched_off_html

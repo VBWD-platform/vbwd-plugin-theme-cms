@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional
 from plugins.theme.theme.theme_api import NOT_FOUND, ThemeApiError
 
 from .cms_api import CmsApi
+from .seo_indexing import SEO_INDEXABLE_FIELD, is_seo_indexable
 
 TERMS_ARCHIVE_LAYOUT_SLUG = "terms-archive"
 TERM_ARCHIVE_SLUG_PATTERN = re.compile(r"^(category|tag)/(.+)$")
@@ -138,6 +139,8 @@ class CmsPageResolver:
             layout,
         )
         page["meta_description"] = term.get("description")
+        # The archive family's indexable switch (S154 D7), read by the head.
+        page[SEO_INDEXABLE_FIELD] = is_seo_indexable(term)
         page["term_archive"] = {
             "term_type": term["term_type"],
             "slug": term["slug"],

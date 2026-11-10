@@ -252,3 +252,21 @@ def test_nothing_found_re_raises_the_original_404():
 def test_page_type_of_a_real_post_is_its_type():
     assert page_type_of({"type": "post"}) == "post"
     assert page_type_of({}) == "page"
+
+
+def test_a_switched_off_term_archive_carries_its_indexable_flag():
+    term = {"term_type": "category", "slug": "guides", "name": "Guides"}
+    switched_off = dict(term, seo_indexable=False)
+    off_page = (
+        CmsPageResolver(FakeCmsApi(terms={("category", "guides"): switched_off}))
+        .resolve("category/guides")
+        .page
+    )
+    unflagged_page = (
+        CmsPageResolver(FakeCmsApi(terms={("category", "guides"): term}))
+        .resolve("category/guides")
+        .page
+    )
+
+    assert off_page["seo_indexable"] is False
+    assert unflagged_page["seo_indexable"] is True

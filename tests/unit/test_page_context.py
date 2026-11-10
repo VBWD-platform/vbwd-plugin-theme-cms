@@ -362,3 +362,35 @@ def test_a_page_without_overrides_emits_no_og_type_or_og_url():
 
     assert seo["og_type"] is None and seo["og_url"] is None
     assert seo["canonical_url"] == "https://site.example/shop-product-detail"
+
+
+# ── S154 D7: a switched-off content type renders noindex,follow ─────────────
+
+
+def test_switched_off_type_renders_noindex_follow():
+    seo = _build(_page(robots="index,follow", seo_indexable=False))["cms_seo"]
+
+    assert seo["robots"] == "noindex,follow"
+
+
+def test_indexable_or_unflagged_page_keeps_its_robots():
+    flagged_on = _build(_page(robots="index,follow", seo_indexable=True))["cms_seo"]
+    unflagged = _build(_page(robots="index,follow"))["cms_seo"]
+
+    assert flagged_on["robots"] == "index,follow"
+    assert unflagged["robots"] == "index,follow"
+
+
+def test_an_own_noindex_nofollow_wins_over_the_switch():
+    seo = _build(_page(robots="noindex,nofollow", seo_indexable=False))["cms_seo"]
+
+    assert seo["robots"] == "noindex,nofollow"
+
+
+def test_seo_override_robots_win_over_the_template_page_switch():
+    template_page = dict(TEMPLATE_PAGE, robots="index,follow", seo_indexable=False)
+    seo = _build(template_page, seo_overrides=SeoOverrides(robots="index,follow"))[
+        "cms_seo"
+    ]
+
+    assert seo["robots"] == "index,follow"

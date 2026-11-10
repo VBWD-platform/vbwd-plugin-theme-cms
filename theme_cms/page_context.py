@@ -17,6 +17,7 @@ from .layout_areas import widgets_for_area
 from .markup import json_script_text, style_text
 from .page_resolver import ResolvedCmsPage, page_type_of
 from .registries import ComponentTemplateRegistry, PageTypeTemplateRegistry
+from .seo_indexing import SWITCHED_OFF_ROBOTS, is_seo_indexable
 from .tags_custom_fields import tags_and_custom_fields
 from .tiptap import render_tiptap_document
 from .widget_views import WidgetViewBuilder
@@ -94,6 +95,15 @@ def derive_canonical_url(
     return site_url(public_base_url, path)
 
 
+def _page_robots(page: Mapping[str, Any]) -> Optional[str]:
+    """The page's robots, or ``noindex,follow`` when its type is switched off
+    (S154 D7). A page that already says ``noindex`` keeps its own value."""
+    robots = page.get("robots")
+    if is_seo_indexable(page) or "noindex" in (robots or "").lower():
+        return robots
+    return SWITCHED_OFF_ROBOTS
+
+
 def _page_title(page: Mapping[str, Any]) -> str:
     return page.get("meta_title") or page.get("name") or page.get("title") or ""
 
@@ -104,7 +114,7 @@ def _seo_fields(
     schema_json = page.get("schema_json")
     return {
         "description": page.get("meta_description"),
-        "robots": page.get("robots"),
+        "robots": _page_robots(page),
         "canonical_url": canonical_url,
         "og_title": page.get("og_title") or title,
         "og_description": page.get("og_description"),
