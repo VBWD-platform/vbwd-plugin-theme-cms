@@ -9,7 +9,13 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from flask import abort
 
-from plugins.theme.theme.page_registry import PUBLIC_PAGE, SPA_ONLY_PREFIXES, ThemePage
+from plugins.theme.theme.page_registry import (
+    PUBLIC_PAGE,
+    SPA_ONLY_PREFIXES,
+    ThemePage,
+    is_under_any_prefix,
+    resolve_fe_user_route_prefixes,
+)
 from plugins.theme.theme.theme_api import (
     FORBIDDEN,
     NOT_FOUND,
@@ -45,11 +51,11 @@ CORE_PUBLIC_CONFIG_PATH = "/api/v1/config"
 # SPA_ONLY_PREFIXES. A route missing here still works for users (nginx serves
 # the SPA shell) but answers HTTP 404 — keep this in sync with the fe-user routes.
 # A more specific themed rule (``/pay/stripe``) still wins over the catch-all.
+# Routes under an operator-configurable base are NOT listed: their plugin
+# declares them at runtime (theme ``FeUserRouteOwner``, S154 D9).
 SPA_APP_ROUTE_PREFIXES = (
     "/index.html",  # core router: redirect to home
     "/pay",  # payment plugins: /pay/<provider>[/success|/cancel|/voucher]
-    "/ghrm",  # ghrm: /ghrm/auth/github/callback
-    "/software",  # ghrm catalogue base (default ``catalogue_page_slug``)
     "/s",  # office: /s/:token public share
     "/landing1",  # landing1
     "/embed/landing1",  # landing1 embed
@@ -89,10 +95,9 @@ def _core_site_name(theme_request: ThemeRequest) -> str:
 
 
 def _is_spa_path(path: str) -> bool:
-    return any(
-        path == prefix or path.startswith(prefix + "/")
-        for prefix in SPA_ONLY_PREFIXES + SPA_APP_ROUTE_PREFIXES
-    )
+    return is_under_any_prefix(
+        path, SPA_ONLY_PREFIXES + SPA_APP_ROUTE_PREFIXES
+    ) or is_under_any_prefix(path, resolve_fe_user_route_prefixes())
 
 
 class CmsPages:

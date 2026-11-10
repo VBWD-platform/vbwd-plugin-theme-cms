@@ -1,7 +1,9 @@
 """Integration fixtures: a real ``create_app`` in theme mode with cms + theme + theme_cms.
 
-* Boot is narrowed to exactly cms, theme, theme_cms and a test-only adapter
-  (``fake_shop_adapter.py``, a higher-priority ``/shop`` page): the stand-in for
+* Boot is narrowed to exactly cms, theme, theme_cms, a test-only adapter
+  (``fake_shop_adapter.py``, a higher-priority ``/shop`` page) and a test-only
+  owner of SPA routes under a configurable base (``fake_route_owner.py``,
+  S154 D9): the stand-in for
   ``load_persisted_state`` validates + enables them in dependency order, the
   same calls the core makes.
 * The fe-user manifest (``VBWD_FE_USER_PLUGINS_JSON``) enables fe-user "cms".
@@ -22,12 +24,22 @@ import pytest
 
 from vbwd.plugins.manager import PluginManager
 
+from plugins.theme_cms.tests.integration.fake_route_owner import (
+    FAKE_ROUTE_OWNER_NAME,
+    FakeRouteOwnerPlugin,
+)
 from plugins.theme_cms.tests.integration.fake_shop_adapter import (
     FAKE_SHOP_ADAPTER_NAME,
     FakeShopAdapterPlugin,
 )
 
-BOOT_ORDER = ("cms", "theme", "theme_cms", FAKE_SHOP_ADAPTER_NAME)
+BOOT_ORDER = (
+    "cms",
+    "theme",
+    "theme_cms",
+    FAKE_SHOP_ADAPTER_NAME,
+    FAKE_ROUTE_OWNER_NAME,
+)
 CMS_TEST_CONFIG = {
     "enabled_languages": "en,de",
     "default_language": "en",
@@ -49,9 +61,10 @@ def _test_database_url() -> str:
 
 
 def _enable_only_the_cms_theme_stack(plugin_manager: PluginManager) -> None:
-    """Stands in for ``load_persisted_state``: enable cms, theme, theme_cms, the fake adapter."""
-    plugin_manager.register_plugin(FakeShopAdapterPlugin())
-    plugin_manager.initialize_plugin(FAKE_SHOP_ADAPTER_NAME)
+    """Stands in for ``load_persisted_state``: enable the cms theme stack + the fakes."""
+    for fake_plugin in (FakeShopAdapterPlugin(), FakeRouteOwnerPlugin()):
+        plugin_manager.register_plugin(fake_plugin)
+        plugin_manager.initialize_plugin(fake_plugin.metadata.name)
     for plugin_name in BOOT_ORDER:
         plugin = plugin_manager.get_plugin(plugin_name)
         plugin.validate_environment()

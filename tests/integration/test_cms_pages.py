@@ -16,6 +16,7 @@ from plugins.theme.theme.page_rendering import (
     NOT_FOUND_LABEL_HEADER_VALUE,
 )
 from plugins.theme_cms.tests.integration.cms_seed import unique
+from plugins.theme_cms.tests.integration.fake_route_owner import FAKE_ROUTE_OWNER_BASE
 
 RENDER = {"X-VBWD-Render": "1"}
 REGIONS_PATH = "/_render/_fragment/regions"
@@ -353,9 +354,6 @@ def test_the_catch_all_never_answers_spa_only_paths(client, cms):
         "/index.html",
         "/pay/yookassa",
         "/pay/conekta/voucher",
-        "/ghrm/auth/github/callback",
-        "/software",
-        "/software/some-package",
         "/s/share-token",
         "/landing1",
         "/embed/landing1",
@@ -368,6 +366,31 @@ def test_the_catch_all_hands_spa_app_routes_back_unlabelled(client, spa_path):
 
     assert response.status_code == 404
     assert NOT_FOUND_LABEL_HEADER not in response.headers
+
+
+@pytest.mark.parametrize(
+    "owned_path",
+    [FAKE_ROUTE_OWNER_BASE, f"{FAKE_ROUTE_OWNER_BASE}/some-package"],
+)
+def test_the_catch_all_hands_a_plugin_owned_configurable_base_back_unlabelled(
+    client, owned_path
+):
+    # S154 D9: an enabled plugin declares its configurable base at runtime.
+    response = _get(client, owned_path)
+
+    assert response.status_code == 404
+    assert NOT_FOUND_LABEL_HEADER not in response.headers
+
+
+@pytest.mark.parametrize(
+    "unowned_path", ["/software", "/software/some-package", "/my-catalogues"]
+)
+def test_a_base_no_enabled_plugin_declares_is_a_labelled_404(client, unowned_path):
+    # S154 D9: no literal catalogue base is special — only what a plugin declares.
+    response = _get(client, unowned_path)
+
+    assert response.status_code == 404
+    assert response.headers.get(NOT_FOUND_LABEL_HEADER) == NOT_FOUND_LABEL_HEADER_VALUE
 
 
 @pytest.mark.parametrize("junk_path", ["/pharmacyx", "/landing1x/y", "/My.vue"])
