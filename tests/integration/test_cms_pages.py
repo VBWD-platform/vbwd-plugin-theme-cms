@@ -447,6 +447,36 @@ def test_pages_index_lists_published_pages(client, cms):
     assert f'href="/{page["slug"]}"' in html or "cms-index__pagination" in html
 
 
+def test_pages_index_pagination_is_real_crawlable_links_that_keep_the_category(
+    client, cms
+):
+    """S154 D5 — real ``<a href>`` prev/next (no JS-only pager), with the active
+    ``?category=`` filter carried on every link."""
+    category = cms.term("category", "Pager")
+    for _ in range(3):
+        cms.categorize(cms.post(title=unique("Paged")), category)
+    paged = {"category": category["slug"], "per_page": 1}
+
+    first = _get(client, "/pages", query_string=paged).get_data(as_text=True)
+    middle = _get(client, "/pages", query_string={**paged, "page": 2}).get_data(
+        as_text=True
+    )
+    last = _get(client, "/pages", query_string={**paged, "page": 3}).get_data(
+        as_text=True
+    )
+    next_href = f'href="?category={category["slug"]}&amp;page=2"'
+    middle_prev_href = f'href="?category={category["slug"]}&amp;page=1"'
+    middle_next_href = f'href="?category={category["slug"]}&amp;page=3"'
+    last_prev_href = f'href="?category={category["slug"]}&amp;page=2"'
+
+    assert 'data-testid="cms-index-prev" aria-disabled="true"' in first
+    assert f'data-testid="cms-index-next" {next_href}' in first
+    assert f'data-testid="cms-index-prev" {middle_prev_href}' in middle
+    assert f'data-testid="cms-index-next" {middle_next_href}' in middle
+    assert f'data-testid="cms-index-prev" {last_prev_href}' in last
+    assert 'data-testid="cms-index-next" aria-disabled="true"' in last
+
+
 @pytest.fixture
 def user_with_level(app, db):
     from vbwd.repositories.user_repository import UserRepository

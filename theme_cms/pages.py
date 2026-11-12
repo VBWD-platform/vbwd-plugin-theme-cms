@@ -248,4 +248,9 @@ class CmsPages:
             "listing": listing,
             "categories": cms_api.categories(),
             "active_category": active_category,
+            "pagination": pagination(
+                listing.get("page") or FIRST_PAGE,
+                listing.get("pages") or FIRST_PAGE,
+                extra_query={"category": active_category} if active_category else None,
+            ),
         }

@@ -50,15 +50,24 @@ def fetch_listing(cms_api: Any, query: Mapping[str, Any]) -> Dict[str, Any]:
     }
 
 
-def pagination(page: int, pages: int) -> Optional[Dict[str, Any]]:
-    """The prev / next links of a paginated listing; ``None`` for a single page."""
+def pagination(
+    page: int, pages: int, extra_query: Optional[Mapping[str, Any]] = None
+) -> Optional[Dict[str, Any]]:
+    """The prev / next ``<a href>`` of a paginated listing; ``None`` for a single
+    page. ``extra_query`` (e.g. the active ``?category=``) rides along on every
+    link, so a crawler following prev/next never drops the caller's filter."""
     if pages <= FIRST_PAGE:
         return None
+
+    def href(target_page: int) -> str:
+        query = {**(extra_query or {}), PAGE_QUERY_PARAMETER: target_page}
+        return f"?{urlencode(query)}"
+
     return {
         "page": page,
         "pages": pages,
-        "previous_href": f"?page={page - 1}" if page > FIRST_PAGE else None,
-        "next_href": f"?page={page + 1}" if page < pages else None,
+        "previous_href": href(page - 1) if page > FIRST_PAGE else None,
+        "next_href": href(page + 1) if page < pages else None,
     }
 
 

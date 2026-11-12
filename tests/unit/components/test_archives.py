@@ -27,6 +27,7 @@ from plugins.theme_cms.theme_cms.components.archives import (
     build_tag_archive_context,
     build_term_archive_context,
     build_term_list_context,
+    pagination,
 )
 
 
@@ -106,6 +107,29 @@ def test_post_archive_without_paginate_or_a_single_page_has_no_pagination():
     )
 
     assert single["pagination"] is None and switched_off["pagination"] is None
+
+
+def test_pagination_extra_query_rides_along_in_the_prev_next_hrefs():
+    """S154 D5 — a caller with its own filters (e.g. ``/pages?category=``) keeps
+    them on every pager link, so a crawler following prev/next never drops the
+    active filter."""
+    carried = pagination(2, 3, extra_query={"category": "news"})
+
+    assert carried == {
+        "page": 2,
+        "pages": 3,
+        "previous_href": "?category=news&page=1",
+        "next_href": "?category=news&page=3",
+    }
+
+
+def test_pagination_without_extra_query_is_unchanged():
+    assert pagination(1, 2) == {
+        "page": 1,
+        "pages": 2,
+        "previous_href": None,
+        "next_href": "?page=2",
+    }
 
 
 @pytest.mark.parametrize(

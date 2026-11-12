@@ -18,8 +18,12 @@
     {%- endfor %}
   </ul>
   {%- endif %}
-  {%- if listing.pages > 1 %}
-  <div class="cms-index__pagination"><span>{{ listing.page }} / {{ listing.pages }}</span></div>
+  {%- if pagination %}
+  <div class="cms-index__pagination">
+  {%- if pagination.previous_href %}<a data-testid="cms-index-prev" href="{{ pagination.previous_href }}">‹</a>{% else %}<a data-testid="cms-index-prev" aria-disabled="true">‹</a>{% endif -%}
+  <span>{{ pagination.page }} / {{ pagination.pages }}</span>
+  {%- if pagination.next_href %}<a data-testid="cms-index-next" href="{{ pagination.next_href }}">›</a>{% else %}<a data-testid="cms-index-next" aria-disabled="true">›</a>{% endif -%}
+  </div>
   {%- endif %}
 </div>
 {% endblock %}
